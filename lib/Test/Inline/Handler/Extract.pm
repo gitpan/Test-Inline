@@ -24,7 +24,7 @@ use File::Slurp ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_04';
+	$VERSION = '2.00_05';
 }
 
 
@@ -38,7 +38,7 @@ BEGIN {
 
 =head2 new $file | \$source
 
-The C<new> constructor creates a new Extractor object. It is passed either a
+The C<new> constructor creates a new Extract object. It is passed either a
 file name from which the source code would be loaded, or a reference to a
 string that directly contains source code.
 
@@ -97,14 +97,19 @@ BEGIN {
 		(?:^|\n)                           # After the beginning of the string, or a newline
 		(                                  # ... start capturing
 		                                   # EITHER
-			package\s+                         # A package
-			[^\W\d]\w*(?:(?:\'|::)[^\W\d]\w*)* # ... with a name
-			\s*;                               # And a statement terminator
+			package\s+                            # A package
+			[^\W\d]\w*(?:(?:\'|::)[^\W\d]\w*)*    # ... with a name
+			\s*;                                  # And a statement terminator
 		|                                  # OR
-			=begin[\ \t]+(?:test|testing)\b    # ... when we find a =begin test or testing
-			.*?                                # ... and keep capturing
-			\n=end[\ \t]+(?:test|testing)\s*?  # ... until an =end tag
-			(?:\n|$)                           # ... at the end of file or a newline
+			=for[ \t]+example[ \t]+begin\n        # ... when we find a =for example begin
+			.*?                                   # ... and keep capturing
+			\n=for[ \t]+example[ \t]+end\s*?      # ... until the =for example end
+			(?:\n|$)                              # ... at the end of file or a newline
+		|                                  # OR
+			=begin[ \t]+(?:test|testing)\b        # ... when we find a =begin test or testing
+			.*?                                   # ... and keep capturing
+			\n=end[ \t]+(?:test|testing)\s*?      # ... until an =end tag
+			(?:\n|$)                              # ... at the end of file or a newline
 		)                                  # ... and stop capturing
 		/isx;
 }
@@ -130,7 +135,7 @@ sub _elements {
 =head1 TO DO
 
 - For certain very complex cases, add a more intensive alternative parser
-based on PPI.
+based on PPI and/or POD::Parser
 
 =head1 SUPPORT
 

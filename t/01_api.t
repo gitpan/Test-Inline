@@ -20,7 +20,7 @@ BEGIN {
 use Test::Inline;
 
 # Execute the API test
-use Test::More 'tests' => 74;
+use Test::More 'tests' => 75;
 use Test::ClassAPI;
 Test::ClassAPI->execute('complete', 'collisions');
 
@@ -53,6 +53,7 @@ parse=method
 new=method
 begin=method
 setup=method
+example=method
 context=method
 name=method
 after=method

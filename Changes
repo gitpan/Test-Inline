@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Inline
 
+2.00_05 Sat Mar 26 2005
+	- Added support for =for example begin -> =for example end blocks
+
 2.00_04	Fri Mar 25 2005
 	- Resolved rt.cpan.org #557 (Catch and thow error for badly nested POD)
 

@@ -102,7 +102,7 @@ use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_04';
+	$VERSION = '2.00_05';
 	$errstr  = '';
 }
 
@@ -128,15 +128,23 @@ C<=begin testing> or C<=being test setup>. Returns C<undef> on error.
 
 =cut
 
+my $RE_begin   = qr/=begin\s+(?:test|testing)/;
+my $RE_example = qr/=for\s+example\s+begin/;
+
 sub new {
 	$errstr     = '';
 	my $class   = shift;
-	my $pod     = $_[0] =~ /^=begin\s+(?:test|testing)\b/ ? shift :
+	my $pod     = $_[0] =~ /^(?:$RE_begin|$RE_example)\b/ ? shift :
 		return $class->_error("Test section does not begin with =begin test[ing]");
 	my $context = shift;
 
 	# Split into lines
 	my @lines = split /(?:\015{1,2}\012|\015|\012)/, $pod;
+
+	# Handle =for example seperately
+	if ( $pod =~ /^$RE_example\b/ ) {
+		return $class->_example( \@lines, $context );
+	}
 
 	# Get the begin paragraph ( yes, paragraph. NOT line )
 	my $begin = '';
@@ -154,23 +162,15 @@ sub new {
 	while ( @lines and $lines[0]  eq '' ) { shift @lines }
 	while ( @lines and $lines[-1] eq '' ) { pop @lines   }
 
-	# In the remaining lines there shouldn't be any lines
-	# that look like a POD tag. If there is there is probably
-	# a nesting problem.
-	my $bad_line = List::Util::first { /^=\w+/ } @lines;
-	if ( $bad_line ) {
-		$bad_line = $class->_short($bad_line);
-		$begin    = $class->_short($begin);
-		return $class->_error(
-			"POD statement '$bad_line' illegally nested inside of section '$begin'"
-			);
-	}
+	# Check for nesting problems
+	$class->_nesting( \@lines, $begin ) or return undef;
 
 	# Create the basic object
 	my $self = bless {
 		begin   => $begin,
 		content => join( '', map { "$_\n" } @lines ),
 		setup   => '',       # Is this a setup section
+		example => '',       # Is this an example section
 		context => $context, # Package context
 		name    => undef,    # The name of the test
 		tests   => undef,    # undef means unknown test count
@@ -243,6 +243,46 @@ sub new {
 	$self;
 }
 
+# Handle the creation of example sections
+sub _example {
+	my $class   = shift;
+	my @lines   = @{shift()};
+	my $context = shift;
+
+	# Get the begin paragraph ( yes, paragraph. NOT line )
+	my $begin = '';
+	while ( @lines and $lines[0] !~ /^\s*$/ ) {
+		$begin .= ' ' if $begin;
+		$begin .= shift @lines;
+	}
+	
+	# Remove the trailing end tag
+	if ( @lines and $lines[-1] =~ /^=for\s+example\s+end\b/o ) {
+		pop @lines;
+	}
+
+	# Remove any leading and trailing empty lines
+	while ( @lines and $lines[0]  eq '' ) { shift @lines }
+	while ( @lines and $lines[-1] eq '' ) { pop @lines   }
+
+	# Check for nesting problems
+	$class->_nesting( \@lines, $begin ) or return undef;
+
+	# Create the basic object
+	my $self = bless {
+		begin   => $begin,
+		content => join( '', map { "$_\n" } @lines ),
+		setup   => '',       # Is this a setup section
+		example => 1,        # Is this an example section
+		context => $context, # Package context
+		name    => undef,    # Examples arn't named
+		tests   => 1,        # An example always consumes 1 test
+		after   => {},       # Other named methods this should be after
+		classes => {},       # Other classes this should be after
+		}, $class;
+
+}
+
 sub _error {
 	$errstr = join ': ', @_;
 	undef;
@@ -261,7 +301,25 @@ sub _short {
 	$string;
 }
 
-	
+sub _nesting {
+	my ($class, $lines, $begin) = @_;
+
+	# In the remaining lines there shouldn't be any lines
+	# that look like a POD tag. If there is there is probably
+	# a nesting problem.
+	my $bad_line = List::Util::first { /^=\w+/ } @$lines;
+	if ( $bad_line ) {
+		$bad_line = $class->_short($bad_line);
+		$begin    = $class->_short($begin);
+		return $class->_error(
+			"POD statement '$bad_line' illegally nested inside of section '$begin'"
+			);
+	}
+
+	1;
+}
+
+
 
 
 
@@ -317,14 +375,29 @@ sub parse {
 
   my $run_first = $Section->setup;
 
-The C<setup> indicates that this section is a "setup" section, to be run at
-the beginning of the generated test script.
+The C<setup> accessor indicates that this section is a "setup" section,
+to be run at the beginning of the generated test script.
 
 Returns true if this is a setup section, false otherwise.
 
 =cut
 
 sub setup { $_[0]->{setup} }
+
+=pod
+
+=head2 example
+
+  my $just_compile = $Section->example;
+
+The C<example> accessor indicates that this section is an "example"
+section, to be compile-tested instead of run.
+
+Returns true if this is an example section, false otherwise.
+
+=cut
+
+sub example { $_[0]->{example} }
 
 =pod
 

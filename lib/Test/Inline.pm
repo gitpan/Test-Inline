@@ -111,7 +111,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_04';
+	$VERSION = '2.00_05';
 }
 
 
@@ -662,7 +662,7 @@ sub items {
 #####################################################################
 # Support Methods
 
-# Take source code directly, or load it from a file
+# Get the source code from a variety of places
 sub _source {
 	my $self = shift;
 	return undef unless defined $_[0];

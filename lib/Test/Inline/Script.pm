@@ -23,12 +23,12 @@ use List::Util ();
 use Algorithm::Dependency::Ordered;
 use base 'Algorithm::Dependency::Source',
          'Algorithm::Dependency::Item';
-use overload 'bool' => sub () { 1 };
-use overload '""'   => 'filename';
+use overload 'bool' => sub () { 1 },
+             '""'   => 'filename';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_04';
+	$VERSION = '2.00_05';
 }
 
 # Special case, for when doing unit tests ONLY.
@@ -275,6 +275,9 @@ sub merged_content {
 	# Get the sorted Test::Inline::Section objects
 	my $sorted = $self->sorted or return undef;
 
+	# Prepare
+	$self->{_example_count} = 0;
+
 	# Strip out empty sections
 	@$sorted = grep { $_->content =~ /\S/ } @$sorted;
 
@@ -284,6 +287,10 @@ sub merged_content {
 
 	# Merge to create the core testing code
 	$self->{content} = join "\n\n\n", @content;
+
+	# Clean up and return
+	delete $self->{_example_count};
+	$self->{content};
 }
 
 # Take a single generated section of code, and wrap it
@@ -292,6 +299,19 @@ sub _wrap_content {
 	my $self    = shift;
 	my $Section = isa($_[0], 'Test::Inline::Section') ? shift : return undef;
 	my $code    = $Section->content;
+
+	# Wrap in compilation test code if an example
+	if ( $Section->example ) {
+		$self->{_example_count}++;
+		$code =~ s/^/    /mg;
+		$code = "eval q{\n"
+			. "  my \$example = sub {\n"
+			. "    local \$^W = 0;\n"
+			. $code
+			. "  };\n"
+			. "};\n"
+			. "is(\$@, '', 'Example $self->{_example_count} compiles cleanly');\n";
+	}
 
 	# Wrap in scope braces unless it is a setup section
 	unless ( $Section->setup ) {

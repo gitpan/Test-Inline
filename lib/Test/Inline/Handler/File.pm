@@ -33,12 +33,12 @@ underlying filesystem if required.
 use strict;
 use File::Spec ();
 use UNIVERSAL 'isa';
-use Class::Autouse 'File::Flat';
-use Class::Autouse 'File::Find::Rule';
+use Class::Autouse 'File::Flat',
+                   'File::Find::Rule';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_04';
+	$VERSION = '2.00_05';
 }
 
 

@@ -26,6 +26,7 @@ t.data/06_multifile/lib/Test/Three.pm
 t.data/06_multifile/lib/Test/Two.pm
 t.data/06_multifile/t/README
 t.data/09_regression/My/BadPodNesting.pm
+t.data/10_legacy_extract/Inline.pm
 t.data/bad_dependency
 t.data/check_count
 t.data/example
@@ -39,4 +40,6 @@ t/06_multifile.t
 t/07_add_directory.t
 t/08_add_all.t
 t/09_regression.t
+t/10_legacy_extract.t
+t/11_legacy_script.t
 t/99_pod.t
