@@ -98,10 +98,11 @@ order of appearance.
 use strict;
 use UNIVERSAL 'isa';
 use base 'Algorithm::Dependency::Item';
+use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_03';
+	$VERSION = '2.00_04';
 	$errstr  = '';
 }
 
@@ -152,6 +153,18 @@ sub new {
 	# Remove any leading and trailing empty lines
 	while ( @lines and $lines[0]  eq '' ) { shift @lines }
 	while ( @lines and $lines[-1] eq '' ) { pop @lines   }
+
+	# In the remaining lines there shouldn't be any lines
+	# that look like a POD tag. If there is there is probably
+	# a nesting problem.
+	my $bad_line = List::Util::first { /^=\w+/ } @lines;
+	if ( $bad_line ) {
+		$bad_line = $class->_short($bad_line);
+		$begin    = $class->_short($begin);
+		return $class->_error(
+			"POD statement '$bad_line' illegally nested inside of section '$begin'"
+			);
+	}
 
 	# Create the basic object
 	my $self = bless {
@@ -235,7 +248,20 @@ sub _error {
 	undef;
 }
 
+sub _short {
+	my $either = shift;
+	my $string = shift;
+	chomp $string;
+	$string =~ s/\n/ /g;
+	if ( length($string) > 30 ) {
+		$string = substr($string, 27);
+		$string =~ s/\s+$//;
+		$string .= '...';
+	}
+	$string;
+}
 
+	
 
 
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Inline
 
+2.00_04	Fri Mar 25 2005
+	- Resolved rt.cpan.org #557 (Catch and thow error for badly nested POD)
+
 2.00_03 Mon Mar 21 2005
 	- Forgot to update Changes in 2.00_02
 	- Added automatic inclusion of 99_pod.t to my build script,
