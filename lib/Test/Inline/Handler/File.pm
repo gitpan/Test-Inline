@@ -38,7 +38,7 @@ use Class::Autouse 'File::Find::Rule';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_01';
+	$VERSION = '2.00_02';
 }
 
 
@@ -80,18 +80,36 @@ sub _path {
 
 =pod
 
-=head2 exists $file
+=head2 exists_file $file
 
-The C<exists> methods checks to see if a particular file currently exists.
+The C<exists_file> method checks to see if a particular file currently
+exists in the input handler.
 
-Returns true if so, or false if not.
+Returns true if it exists, or false if not.
 
 =cut
 
-sub exists {
+sub exists_file {
 	my $self = shift;
 	my $file = $self->_path(shift) or return undef;
 	!! -f $file;
+}
+
+=pod
+
+=head2 exists_dir $dir
+
+The C<exists_dir> method checks to see if a particular directory currently
+exists in the input handler.
+
+Returns true if it exists, or false if not.
+
+=cut
+
+sub exists_dir {
+	my $self = shift;
+	my $dir = $self->_path(shift) or return undef;
+	!! -d $dir;
 }
 
 =pod
@@ -132,11 +150,11 @@ sub write {
 
 =pod
 
-=head2 file $class
+=head2 class_file $class
 
 Assuming your input FileHandler is pointing at the root directory
 of a lib path (meaning that My::Module will be located at My/Module.pm
-within it) the C<file> method will take a class name, and check to see
+within it) the C<class_file> method will take a class name, and check to see
 if the file for that class exists in the FileHandler.
 
 Returns a reference to an ARRAY containing the filename if it exists,
@@ -144,18 +162,18 @@ or C<undef> on error.
 
 =cut
 
-sub file {
+sub class_file {
 	my $self   = shift;
 	my $_class = defined $_[0] ? shift : return undef;
 	my $file   = File::Spec->catfile( split /(?:::|')/, $_class ) . '.pm';
-	$self->exists($file) and [ $file ];
+	$self->exists_file($file) and [ $file ];
 }
 
 =pod
 
 =head2 find $class
 
-The C<find> method takes as argument a root class, and then scans within
+The C<find> method takes as argument a directory root class, and then scans within
 the input FileHandler to find all files contained in that class or any
 other classes under it's namespace.
 
@@ -165,22 +183,16 @@ or C<undef> on error.
 =cut
 
 sub find {
-	my $self   = shift;
-	my $_class = defined $_[0] ? shift : return undef;
+	my $self  = shift;
+	my $dir   = $self->exists_dir($_[0]) ? shift : return undef;
 
-	# The parent file
-	my $file = $self->file($_class);
-	return $file unless $file;
-
-	# Look for any children
-	my $dir   = substr( $file->[0], 0, length($file->[0]) - 3 );
-	my $path  = File::Spec->catdir( $self->{path}, $dir );
+	# Search within the path
 	my @files = File::Find::Rule->file
 	                            ->name('*.pm')
 	                            ->relative
-	                            ->in( $path );
+	                            ->in( $self->_path($dir) );
 	@files = map { File::Spec->catfile( $dir, $_ ) } sort @files;
-	[ @$file, @files ];
+	return \@files;
 }
 
 1;

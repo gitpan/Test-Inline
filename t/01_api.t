@@ -20,7 +20,7 @@ BEGIN {
 use Test::Inline;
 
 # Execute the API test
-use Test::More 'tests' => 72;
+use Test::More 'tests' => 74;
 use Test::ClassAPI;
 Test::ClassAPI->execute('complete', 'collisions');
 
@@ -39,6 +39,7 @@ InputHandler=method
 OutputHandler=method
 add=method
 add_class=method
+add_all=method
 classes=method
 class=method
 filenames=method
@@ -80,10 +81,11 @@ elements=method
 
 [Test::Inline::Handler::File]
 new=method
-exists=method
+exists_file=method
+exists_dir=method
 read=method
 write=method
-file=method
+class_file=method
 find=method
 
 [Algorithm::Dependency::Source]

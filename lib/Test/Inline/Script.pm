@@ -28,7 +28,7 @@ use overload '""'   => 'filename';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_01';
+	$VERSION = '2.00_02';
 }
 
 # Special case, for when doing unit tests ONLY.

@@ -17,7 +17,7 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Inline ();
 
 # Prepare
@@ -40,10 +40,10 @@ my $File = Test::Inline::Handler::File->new( $libdir );
 isa_ok( $File, 'Test::Inline::Handler::File' );
 
 # The file for the main Test::Inline file MUST exist
-ok( $File->exists( $inline2 ), '->exists returns true for a file that exists' );
+ok( $File->exists_file( $inline2 ), '->exists returns true for a file that exists' );
 
 # On the other hand, there isn't a Test::Inline3 module
-ok( ! $File->exists( $inline3 ), '->exists return false for a file that does not exist' );
+ok( ! $File->exists_file( $inline3 ), '->exists return false for a file that does not exist' );
 
 # Read the contents of Test::Inline and check the file length
 my $source = $File->read( $inline2 );
@@ -55,18 +55,21 @@ ok( length $$source < 20000, '->read returns a string that is not TOO long' );
 is( $File->read( $inline3 ), undef, '->read of a bad file returns undef' );
 
 # Check good and bad ->file calls
-is_deeply( $File->file( 'Test::Inline' ), [ $inline2 ], '->file with an existing class returns correctly' );
-is( $File->file( 'Test::Inline3' ), '', '->file with a bad class returns false' );
+is_deeply( $File->class_file( 'Test::Inline' ), [ $inline2 ], '->file with an existing class returns correctly' );
+is( $File->class_file( 'Test::Inline3' ), '', '->file with a bad class returns false' );
 
 # Check good and bad ->find calls
-is_deeply( $File->find( 'Test::Inline' ), [
-	catfile( 'Test', 'Inline.pm' ),
+is_deeply( $File->find( 'Test/Inline' ), [
 	catfile( 'Test', 'Inline', 'Handler', 'Extract.pm' ),
 	catfile( 'Test', 'Inline', 'Handler', 'File.pm'    ),
 	catfile( 'Test', 'Inline', 'Script.pm'  ),
 	catfile( 'Test', 'Inline', 'Section.pm' ),
 	catfile( 'Test', 'Inline', 'Util.pm'    ),
-	], '->find with an existing class returns it and all its children' );
-is( $File->find( 'Test::Inline3' ), '', '->find with a bad class returns undef' );
+	], '->find with path returns everything below it' );
+is_deeply( $File->find( 'Test/Inline/Handler' ), [
+	catfile( 'Test', 'Inline', 'Handler', 'Extract.pm' ),
+	catfile( 'Test', 'Inline', 'Handler', 'File.pm'    ),
+	], '->find with path returns everything below it' );
+is( $File->find( 'Test/Inline3' ), undef, '->find with a dir returns undef' );
 
 1;

@@ -101,7 +101,7 @@ use base 'Algorithm::Dependency::Item';
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_01';
+	$VERSION = '2.00_02';
 	$errstr  = '';
 }
 

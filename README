@@ -147,11 +147,15 @@ METHODS
         The "OutputHandler" accessor returns the file handler object that
         the generated test scripts will be written to.
 
-  add $file, \$source
-        The "add" method takes as argument a filename or a reference to a
-        SCALAR containing perl code, parses it, and creates zero or more
-        Test::Inline::Script objects representing the test scripts that will
-        be generated for that source code.
+  add $file, \$source, $Handle
+        The "add" method is a parameter-sensitive method for adding
+        something to the build schedule.
+
+        It takes as argument a file path, a directory path, a reference to a
+        SCALAR containing perl code, or an IO::Handle (or subclass) object.
+        It will retrieve code from the parameter as appropriate, parse it,
+        and create zero or more Test::Inline::Script objects representing
+        the test scripts that will be generated for that source code.
 
         Returns the number of test scripts added, which could be zero, or
         "undef" on error.
@@ -168,6 +172,13 @@ METHODS
         Returns the number of classes found with inline tests, and added,
         including 0 if no classes with tests are found. Returns "undef" if
         an error occurs while adding the class or it's children.
+
+  add_all
+        The "add_all" method will search the InputHandler for all *.pm
+        files, and add them to the generation set.
+
+        Returns the total number of test scripts added, which may be zero,
+        or "undef" on error.
 
   classes
         The "classes" method returns a list of the names of all the classes

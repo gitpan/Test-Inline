@@ -20,6 +20,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
+t.data/06_multifile/All.pm
 t.data/06_multifile/lib/Test/One.pm
 t.data/06_multifile/lib/Test/Three.pm
 t.data/06_multifile/lib/Test/Two.pm
@@ -34,3 +35,5 @@ t/03_bad_dependency.t
 t/04_file_handler.t
 t/05_check_count.t
 t/06_multifile.t
+t/07_add_directory.t
+t/08_add_all.t

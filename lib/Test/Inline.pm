@@ -96,6 +96,7 @@ Tests with side-effects such as those that might change a testing database
 use strict;
 use UNIVERSAL 'isa';
 use File::Spec            ();
+use IO::Handle            ();
 use Algorithm::Dependency ();
 use Test::Inline::Util    ();
 use Test::Inline::Section ();
@@ -108,7 +109,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_01';
+	$VERSION = '2.00_02';
 }
 
 
@@ -286,12 +287,16 @@ sub OutputHandler { $_[0]->{OutputHandler} }
 
 =pod
 
-=head2 add $file, \$source
+=head2 add $file, \$source, $Handle
 
-The C<add> method takes as argument a filename or a reference to a SCALAR
-containing perl code, parses it, and creates zero or more
-L<Test::Inline::Script> objects representing the test scripts that will
-be generated for that source code.
+The C<add> method is a parameter-sensitive method for adding something
+to the build schedule.
+
+It takes as argument a file path, a directory path, a reference to a SCALAR
+containing perl code, or an L<IO::Handle> (or subclass) object. It will
+retrieve code from the parameter as appropriate, parse it, and create zero
+or more L<Test::Inline::Script> objects representing the test scripts that
+will be generated for that source code.
 
 Returns the number of test scripts added, which could be zero, or C<undef>
 on error.
@@ -301,45 +306,13 @@ on error.
 sub add {
 	my $self   = shift;
 	my $source = $self->_source(shift) or return undef;
-
-	# Extract the elements from the source code
-	my $Extract = $self->ExtractHandler->new( $source )
-		or return $self->_error("Failed to create ExtractHandler");
-	my $elements = $Extract->elements or return 0;
-
-	# Parse the elements into sections
-	my $Sections = Test::Inline::Section->parse( $elements )
-		or return $self->_error("Failed to parse sections: $Test::Inline::Section::errstr");
-
-	# Split up the Sections by class
-	my %classes = ();
-	foreach my $Section ( @$Sections ) {
-		# All sections MUST have a package
-		my $context = $Section->context
-			or return $self->_error("Section does not have a package context");
-		$classes{$context} ||= [];
-		push @{$classes{$context}}, $Section;
+	if ( ref $source ) {
+		# Add a chunk of source code
+		return $self->_add_source($source);
+	} else {
+		# Add a whole directory
+		return $self->_add_directory($source);
 	}
-
-	# Convert the collection of Sections into class-specific test file objects
-	my $added = 0;
-	my $Classes = $self->{Classes};
-	foreach my $_class ( keys %classes ) {
-		# We can't safely spread tests for the same class across
-		# different files. Error if we spot a duplicate.
-		if ( $Classes->{$_class} ) {
-			return $self->_error("Caught duplicate test class");
-		}
-
-		# Create a new ::TestFile object for the collection of Sections
-		my $File = Test::Inline::Script->new($_class, $classes{$_class}, $self->{check_count})
-			or return $self->_error("Failed to create a new TestFile for '$_class'");
-		$self->_verbose("Adding $File to schedule\n");
-		$Classes->{$_class} = $File;
-		$added++;
-	}
-
-	$added++;
 }
 
 =pod
@@ -384,6 +357,86 @@ sub add_class {
 	delete $self->{filenames};
 
 	$added;
+}
+
+=pod
+
+=head2 add_all
+
+The C<add_all> method will search the InputHandler for all *.pm files,
+and add them to the generation set.
+
+Returns the total number of test scripts added, which may be zero, or
+C<undef> on error.
+
+=cut
+
+sub add_all {
+	shift->_add_directory('.');
+}
+
+# Recursively add an entire directory of files
+sub _add_directory {
+	my $self = shift;
+
+	# Find all module files in the directory
+	my $files = $self->InputHandler->find(shift) or return undef;
+
+	# Add each file
+	my $added = 0;
+	foreach my $file ( @$files ) {
+		my $source = $self->InputHandler->read($file) or return undef;
+		my $rv = $self->_add_source($source);
+		return undef unless defined $rv;
+		$added += $rv;
+	}
+
+	$added;
+}
+
+# Actually add the source code
+sub _add_source {
+	my $self   = shift;
+	my $source = ref $_[0] eq 'SCALAR' ? shift : return undef;
+
+	# Extract the elements from the source code
+	my $Extract = $self->ExtractHandler->new( $source )
+		or return $self->_error("Failed to create ExtractHandler");
+	my $elements = $Extract->elements or return 0;
+
+	# Parse the elements into sections
+	my $Sections = Test::Inline::Section->parse( $elements )
+		or return $self->_error("Failed to parse sections: $Test::Inline::Section::errstr");
+
+	# Split up the Sections by class
+	my %classes = ();
+	foreach my $Section ( @$Sections ) {
+		# All sections MUST have a package
+		my $context = $Section->context
+			or return $self->_error("Section does not have a package context");
+		$classes{$context} ||= [];
+		push @{$classes{$context}}, $Section;
+	}
+
+	# Convert the collection of Sections into class-specific test file objects
+	my $added = 0;
+	my $Classes = $self->{Classes};
+	foreach my $_class ( keys %classes ) {
+		# We can't safely spread tests for the same class across
+		# different files. Error if we spot a duplicate.
+		if ( $Classes->{$_class} ) {
+			return $self->_error("Caught duplicate test class");
+		}
+
+		# Create a new ::TestFile object for the collection of Sections
+		my $File = Test::Inline::Script->new($_class, $classes{$_class}, $self->{check_count})
+			or return $self->_error("Failed to create a new TestFile for '$_class'");
+		$self->_verbose("Adding $File to schedule\n");
+		$Classes->{$_class} = $File;
+		$added++;
+	}
+
+	$added++;
 }
 
 =pod
@@ -611,9 +664,30 @@ sub items {
 sub _source {
 	my $self = shift;
 	return undef unless defined $_[0];
-	return shift if ref $_[0] eq 'SCALAR';
-	return undef if ref $_[0];
-	$self->InputHandler->read(shift);
+	unless ( ref $_[0] ) {
+		if ( $self->InputHandler->exists_file($_[0]) ) {
+			# File path
+			return $self->InputHandler->read(shift);
+		} elsif ( $self->InputHandler->exists_dir($_[0]) ) {
+			# Directory path
+			return shift; # Handled seperately
+		}
+		return undef;
+	}
+	if ( ref $_[0] eq 'SCALAR' ) {
+		# Reference to SCALAR containing code
+		return shift;
+	}
+	if ( isa(ref $_[0], 'IO::Handle') ) {
+		my $fh   = shift;
+		my $old  = $fh->input_record_separator(undef);
+		my $code = $fh->getline;
+		$fh->input_record_separator($old);
+		return \$code;
+	}
+
+	# Unknown
+	undef;
 }
 
 # Print a message if we are in verbose mode
