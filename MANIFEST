@@ -8,4 +8,5 @@ lib/Pod/Tests/Tutorial.pod
 lib/Test/Inline.pm
 lib/Test/Inline/Tutorial.pod
 t/Tests.t
+t/empty_pod2test.t
 t/pod2test.t

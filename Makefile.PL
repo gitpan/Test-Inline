@@ -56,7 +56,7 @@ API_CHANGE
 WriteMakefile(
     NAME            => $PACKAGE,
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
-    PREREQ_PM       => { Test::More     => 0.05,
+    PREREQ_PM       => { Test::More     => 0.33,
                          Test::Harness  => 1.22,
                        },
     EXE_FILES       => ['bin/pod2test'],

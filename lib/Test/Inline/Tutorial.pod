@@ -156,8 +156,7 @@ examples:
     is(   $_STDOUT_, "Hello, World!\n",               'print' );
     like( $_STDERR_, qr/^Beware the Ides of March!/,  'warn'  );
 
-but they're experimental.  If you want to read more, see
-L<Test::Inline>.
+If you want to read more, see L<Test::Inline>.
 
 
 =head2 FAQ

@@ -1,5 +1,18 @@
 Revision history for Perl extension Test::Inline.
 
+0.14  Thu Feb 28 12:38:53 EST 2002
+    * pod2test now provides an $Original_File
+    * Fixed handling of "print STDERR ..." in tests
+    * Fixed $_STDERR_ and $_STDOUT_ so they clear themselves
+      between test blocks (bug reported by Wolfgang Weisselberg)
+    - Some point between Test::More 0.30 and 0.33 it became unsafe
+      to redirect STDOUT/STDERR in tests.  This broke pod2test.
+      The minimum version of Test::More has been uped (again, thanks
+      Wolfgang)
+
+0.13  Mon Feb 18 16:40:29 EST 2002
+    * pod2test now exits with 1 if it doesn't find any embedded tests
+
 0.12  Mon Nov 12 15:46:49 EST 2001
     * An excuse to upload a new version to CPAN to get this back
       on the indexes.

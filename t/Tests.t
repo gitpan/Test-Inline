@@ -12,8 +12,8 @@ $p->parse_fh(*DATA);
 my @tests       = $p->tests;
 my @examples    = $p->examples;
 
-is( @tests,     2,                      'saw tests' );
-is( @examples,  5,                      'saw examples' );
+is( @tests,     3,                      'saw tests' );
+is( @examples,  6,                      'saw examples' );
 
 is( $tests[0]{line},    11 );
 is( $tests[0]{code},    <<'POD',        'saw =for testing' );
@@ -55,7 +55,7 @@ is( $examples[2]{testing}, <<'POD',     q{  and there's the tests});
 POD
 
 
-is( $examples[4]{line}, 73 );
+is( $examples[4]{line}, 78 );
 is( $examples[4]{code}, <<'POD',        '=for example begin' );
 
   1 + 1 == 2;
@@ -72,8 +72,8 @@ do { $_ = <DATA> } until /^__END__$/;
 
 $p->parse_fh(*DATA);
 
-is( $p->tests,       4,                      'double parse tests' );
-is( $p->examples,   10,                      'double parse examples' );
+is( $p->tests,       6,                      'double parse tests' );
+is( $p->examples,   12,                      'double parse examples' );
 
 
 
@@ -139,13 +139,18 @@ And the special $_STDOUT_ and $_STDERR_ variables..
 
 =for example begin
 
+  local $^W = 1;
   print "Hello, world!\n";
-  warn  "Beware the Ides of March!\n";
+  print STDERR  "Beware the Ides of March!\n";
+  warn "Really, we mean it\n";
 
 =for example end
 
 =for example_testing
-  is( $_STDERR_, "Beware the Ides of March!\n",       '$_STDERR_' );
+  is( $_STDERR_, <<OUT,       '$_STDERR_' );
+Beware the Ides of March!
+Really, we mean it
+OUT
   is( $_STDOUT_, "Hello, world!\n",                   '$_STDOUT_' );
 
 =for example begin
@@ -153,6 +158,24 @@ And the special $_STDOUT_ and $_STDERR_ variables..
   1 + 1 == 2;
 
 =for example end
+
+foo
+
+=for example begin
+
+  print "Hello again\n";
+  print STDERR "Beware!\n";
+
+=for example end
+
+=for example_testing;
+
+  is( $_STDOUT_, "Hello again\n" );
+  is( $_STDERR_, "Beware!\n" );  
+
+=for testing
+  use File::Spec;
+  is( $Original_File, File::Spec->catfile(qw(t Tests.t)) );
 
 =cut
 

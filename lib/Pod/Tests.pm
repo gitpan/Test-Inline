@@ -4,7 +4,7 @@ use 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 
 =head1 NAME
@@ -402,8 +402,12 @@ sub build_tests {
         my $file = $self->{file} || '';
         push @code, <<CODE;
 {
+    undef \$main::_STDOUT_;
+    undef \$main::_STDERR_;
 #line $test->{line} $file
 $test->{code}
+    undef \$main::_STDOUT_;
+    undef \$main::_STDERR_;
 }
 CODE
 
@@ -432,6 +436,8 @@ sub build_examples {
     foreach my $example (@examples) {
         my $file = $self->{file} || '';
         push @code, <<CODE;
+    undef \$main::_STDOUT_;
+    undef \$main::_STDERR_;
 eval q{
   my \$example = sub {
     local \$^W = 0;
@@ -448,6 +454,11 @@ CODE
             $example->{code} .= $example->{testing};
             push @code, $self->build_tests($example);
         }
+
+        push @code, <<CODE;
+    undef \$main::_STDOUT_;
+    undef \$main::_STDERR_;
+CODE
     }
 
     return @code;

@@ -1,6 +1,6 @@
 package Test::Inline;
 
-$VERSION = '0.12';
+$VERSION = '0.14';
 
 
 =head1 NAME
@@ -136,12 +136,26 @@ $_STDOUT_ and $_STDERR_ variables to capture prints and warnings.
       ok( $_STDOUT_ eq "Hello, world!\n" );
       ok( $_STDERR_ eq "Beware the Ides of March!\n" );
 
+$_STDOUT_ and $_STDERR are cleared between testing blocks.
 
 =head2 Formatting
 
 The code examples and embedded tests are B<not> translated from POD,
 thus all the CE<lt>E<gt> and BE<lt>E<gt> style escapes are not valid.
 Its literal Perl code.
+
+=head2 Helpful Variables
+
+Your test will have available to it several helpful variables.
+
+=over 4
+
+=item B<$Original_File>
+
+The location of the original file which pod2test was run over, relative
+to where pod2test was run.
+
+=back
 
 
 =head1 NOTES
