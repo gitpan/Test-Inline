@@ -4,7 +4,7 @@ use 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use File::Spec;
 use Pod::Tests;
@@ -102,6 +102,7 @@ sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
 sub READ {}
 sub READLINE {}
 sub GETC {}
+sub BINMODE {}
 
 my $Original_File = '%s';
 

@@ -13,7 +13,7 @@ my @tests       = $p->tests;
 my @examples    = $p->examples;
 
 is( @tests,     3,                      'saw tests' );
-is( @examples,  6,                      'saw examples' );
+is( @examples,  7,                      'saw examples' );
 
 is( $tests[0]{code},    <<'POD',        'saw =for testing' );
 ok(2+2 == 4);
@@ -74,7 +74,7 @@ do { $_ = <DATA> } until /^__END__$/;
 $p->parse_fh(*DATA);
 
 is( $p->tests,       6,                      'double parse tests' );
-is( $p->examples,   12,                      'double parse examples' );
+is( $p->examples,   14,                      'double parse examples' );
 
 
 
@@ -189,6 +189,12 @@ foo
   is( __LINE__, 189, 'line in =begin/end testing' );
 
 =end testing
+
+=for example begin
+
+  BEGIN{binmode STDOUT};
+
+=for example end
 
 =cut
 

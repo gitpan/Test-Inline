@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 42738ae2c293a732de2d30483cfe6d9d91fd6ce8 Changes
+SHA1 f6038ebdbaffafdffe93de547b102509bf9dfbfe MANIFEST
+SHA1 d416738f1cf7f442d12c17ae279560a3c8566342 META.yml
+SHA1 438e432a7c14ae8c24ce7dea3482e628568d3688 Makefile.PL
+SHA1 eedd2d5d898ed40952f4c74b9565592f687d21b0 bin/pod2test
+SHA1 68db86ef77afa1d287650072e93abd1eaaf40deb docs/rfc183.txt
+SHA1 7d53a1c227126a9570f9545fdd1dd719f9f0838a lib/Pod/Tests.pm
+SHA1 fe89ad80356840cd494b293f7334a874527f5f49 lib/Pod/Tests/Tutorial.pod
+SHA1 f48ef3e2b5c657d771ea8e2f99470d59ccc3c37c lib/Test/Inline.pm
+SHA1 b05e59883db7f59fc93e8a998ef62068049dfa29 lib/Test/Inline/Tutorial.pod
+SHA1 9963667d1c6098dfff5a3845f243a1254ef80496 t/Tests.t
+SHA1 7448b9cbf2ac2ae5fcb55f7f89e9d2519c460224 t/empty_pod2test.t
+SHA1 ae4ffc188766558758c5df648a3849b3e6b47cc4 t/pod2test.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (Darwin)
+
+iD8DBQE/4g9XT4Li3Cw/PzQRAtVgAJ9RcyDKsBY7OQeGWfVLN2ofNf3DbACeOLMF
+8SXBKFcBxyXwjdO+W9UH8so=
+=8ELD
+-----END PGP SIGNATURE-----

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Inline.
 
+0.16  Thu Dec 18 12:32:29 PST 2003
+    - Fixed binmode on STDOUT/STDERR  (thanks Max Maischein)
+
 0.15  Thu Apr 11 15:45:53 EDT 2002
     - Hacked in a solution for when code tries to redirect STDOUT or
       STDERR.  The behavior when redirecting STDOUT & STDERR is

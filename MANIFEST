@@ -10,3 +10,5 @@ lib/Test/Inline/Tutorial.pod
 t/Tests.t
 t/empty_pod2test.t
 t/pod2test.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

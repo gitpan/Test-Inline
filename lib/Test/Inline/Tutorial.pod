@@ -182,7 +182,7 @@ probably go into a seperate file.
 Oddly enough, no.  You can write a program with embedded tests and
 distribute it B<without> requiring Test::Inline.  Simply generate the .t
 files with pod2test and distribute them normally with your code like
-any other?
+any other.
 
 However, it does require Test::More and the latest version of
 Test::Harness.  Fortunately, these will be in 5.8.0.  Unfortunately,

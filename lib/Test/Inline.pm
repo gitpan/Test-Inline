@@ -1,6 +1,6 @@
 package Test::Inline;
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 
 =head1 NAME
@@ -162,9 +162,20 @@ to where pod2test was run.
 
 Test::Inline has been tested and works on perl back to 5.004.
 
+
 =head1 AUTHOR
 
 Michael G Schwern E<lt>schwern@pobox.comE<gt>
+
+
+=head1 COPYRIGHT
+
+Copyright 2002 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See F<http://www.perl.com/perl/misc/Artistic.html>
 
 
 =head1 SEE ALSO

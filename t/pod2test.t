@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 
 use Test::More 'no_plan';
 
@@ -20,6 +20,7 @@ sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
 sub READ {}
 sub READLINE {}
 sub GETC {}
+sub BINMODE {}
 
 my $Original_File = 't/Tests.t';
 
@@ -238,6 +239,25 @@ eval q{
   }
 };
 is($@, '', "example from line 169");
+
+    undef $main::_STDOUT_;
+    undef $main::_STDERR_;
+
+    undef $main::_STDOUT_;
+    undef $main::_STDERR_;
+eval q{
+  my $example = sub {
+    local $^W = 0;
+
+#line 194 t/Tests.t
+
+  BEGIN{binmode STDOUT};
+
+;
+
+  }
+};
+is($@, '', "example from line 194");
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
