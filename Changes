@@ -1,6 +1,10 @@
-Revision history for Perl extension Pod::Tests.
+Revision history for Perl extension Test::Inline.
 
-0.11  
+0.12  Mon Nov 12 15:46:49 EST 2001
+    * An excuse to upload a new version to CPAN to get this back
+      on the indexes.
+
+0.11  Thu Aug 30 18:45:58 EDT 2001
     - Fixed a bug in the testifypods example in Test::Inline::Tutorial
     * pod2test will not generate a test file for POD which has no
       embedded tests.

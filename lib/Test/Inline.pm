@@ -1,6 +1,6 @@
 package Test::Inline;
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 
 =head1 NAME

@@ -113,8 +113,8 @@ is($@, '', "example from line 142");
   print "Hello, world!\n";
   warn  "Beware the Ides of March!\n";
 
-  ok( $_STDOUT_ eq "Hello, world!\n",                   '$_STDOUT_' );
-  ok( $_STDERR_ eq "Beware the Ides of March!\n",       '$_STDERR_' );
+  is( $_STDERR_, "Beware the Ides of March!\n",       '$_STDERR_' );
+  is( $_STDOUT_, "Hello, world!\n",                   '$_STDOUT_' );
 
 }
 

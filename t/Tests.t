@@ -145,8 +145,8 @@ And the special $_STDOUT_ and $_STDERR_ variables..
 =for example end
 
 =for example_testing
-  ok( $_STDOUT_ eq "Hello, world!\n",                   '$_STDOUT_' );
-  ok( $_STDERR_ eq "Beware the Ides of March!\n",       '$_STDERR_' );
+  is( $_STDERR_, "Beware the Ides of March!\n",       '$_STDERR_' );
+  is( $_STDOUT_, "Hello, world!\n",                   '$_STDOUT_' );
 
 =for example begin
 
