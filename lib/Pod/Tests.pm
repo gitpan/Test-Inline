@@ -4,7 +4,7 @@ use 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 
 =head1 NAME
@@ -240,11 +240,16 @@ sub _endfor {
               };
 
     if( $self->{_infor} ) {
-        $self->_example_testing($self->{_currpod})
+        $self->_example_testing($pod)
           if $self->{_infor} eq 'example_testing';
 
         if( $self->{_infor} eq $self->{_lasttype}) {
-            ${$self->{_for}{$self->{_infor}}}[-1]{code} .= $self->{_currpod};
+            my $last_for = ${$self->{_for}{$self->{_infor}}}[-1];
+            $last_for->{code} .= "\n" x ($pod->{line} - 
+                                         ($last_for->{line} + 
+                                          $last_for->{code} =~ tr/\n//)
+                                        );
+            $last_for->{code} .= $self->{_currpod};
         }
         else {
             push @{$self->{_for}{$self->{_infor}}}, $pod;
@@ -286,8 +291,8 @@ sub _endblock {
     my $pod = {
                code => $self->{_currpod},
 
-               # Skip over the "=begin" plus the following newline.
-               line => $self->{_blockstart} + 2,
+               # Skip over the "=begin"
+               line => $self->{_blockstart} + 1,
               };
 
     if( $self->{_inblock} ) {
@@ -295,7 +300,12 @@ sub _endblock {
           if $self->{_inblock} eq 'example_testing';
 
         if( $self->{_inblock} eq $self->{_lasttype}) {
-            ${$self->{_for}{$self->{_inblock}}}[-1]{code} .= $self->{_currpod};
+            my $last_for = ${$self->{_for}{$self->{_inblock}}}[-1];
+            $last_for->{code} .= "\n" x ($pod->{line} - 
+                                         ($last_for->{line} + 
+                                          $last_for->{code} =~ tr/\n//)
+                                        );
+            $last_for->{code} .= $self->{_currpod};
         }
         else {
             push @{$self->{_for}{$self->{_inblock}}}, $pod;
@@ -309,7 +319,15 @@ sub _endblock {
 
 sub _example_testing {
     my($self, $test) = @_;
-    ${$self->{_for}{example}}[-1]{testing} = $test;
+
+    my $last_example = ${$self->{_for}{example}}[-1];
+    $last_example->{code} .= "\n" x ($test->{line} - 
+                                     ($last_example->{line} + 
+                                      $last_example->{code} =~ tr/\n//)
+                                    );
+
+
+    $last_example->{testing} = $test->{code};
 }
 
 

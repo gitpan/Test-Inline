@@ -94,8 +94,8 @@ WriteMakefile(
 
 # Generating pod2test's tests.
 print "Running pod2test.\n";
-system(qq{$^X -I"lib" bin/pod2test t/Tests.t t/pod2test.t});
+system(qq{$^X "-Ilib" bin/pod2test t/Tests.t t/pod2test.t});
 
 # Test that pod2test generates no file when given something that has no
 # tests.
-system(qq{$^X -I"lib" bin/pod2test MANIFEST t/i_should_not_be_written.t});
+system(qq{$^X "-Ilib" bin/pod2test MANIFEST t/i_should_not_be_written.t});

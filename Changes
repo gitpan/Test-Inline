@@ -1,5 +1,12 @@
 Revision history for Perl extension Test::Inline.
 
+0.15  Thu Apr 11 15:45:53 EDT 2002
+    - Hacked in a solution for when code tries to redirect STDOUT or
+      STDERR.  The behavior when redirecting STDOUT & STDERR is
+      currently *UNDEFINED* but at least it doesn't blow up.
+    * Off-by-some line number bugs now fixed.  Embedded tests should
+      report correct line numbers.  __LINE__ should now be correct.
+
 0.14  Thu Feb 28 12:38:53 EST 2002
     * pod2test now provides an $Original_File
     * Fixed handling of "print STDERR ..." in tests

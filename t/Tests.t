@@ -15,21 +15,19 @@ my @examples    = $p->examples;
 is( @tests,     3,                      'saw tests' );
 is( @examples,  6,                      'saw examples' );
 
-is( $tests[0]{line},    11 );
 is( $tests[0]{code},    <<'POD',        'saw =for testing' );
 ok(2+2 == 4);
+is( __LINE__, 93 );
 POD
 
-is( $tests[1]{line},     23 );
 is( $tests[1]{code},    <<'POD',        'saw testing block' );
 
-my $foo = 0;
+my $foo = 0;  is( __LINE__, 105 );
 ok( !$foo,      'foo is false' );
 ok( $foo == 0,  'foo is zero'  );
 
 POD
 
-is( $examples[0]{line},  33 );
 is( $examples[0]{code}, <<'POD',        'saw example block' );
 
   # This is an example.
@@ -38,24 +36,27 @@ is( $examples[0]{code}, <<'POD',        'saw example block' );
 
 POD
 
-is( $examples[1]{line}, 42 );
 is( $examples[1]{code}, <<'POD',       'multi-part example glued together' );
   sub mygrep (&@) { }
+
+
   mygrep { $_ eq 'bar' } @stuff
 POD
 
-is( $examples[2]{line}, 51 );
 is( $examples[2]{code}, <<'POD',        'example with tests' );
 
   my $result = 2 + 2;
 
+
+
+
 POD
 is( $examples[2]{testing}, <<'POD',     q{  and there's the tests});
   ok( $result == 4,         'addition works' );
+  is( __LINE__, 139 );
 POD
 
 
-is( $examples[4]{line}, 78 );
 is( $examples[4]{code}, <<'POD',        '=for example begin' );
 
   1 + 1 == 2;
@@ -89,6 +90,7 @@ Dummy testing file for Pod::Tests
 
 =for testing
 ok(2+2 == 4);
+is( __LINE__, 93 );
 
 This is not a test
 
@@ -100,7 +102,7 @@ code and stuff
 
 =begin testing
 
-my $foo = 0;
+my $foo = 0;  is( __LINE__, 105 );
 ok( !$foo,      'foo is false' );
 ok( $foo == 0,  'foo is zero'  );
 
@@ -134,6 +136,7 @@ And an example_testing block
 
 =for example_testing
   ok( $result == 4,         'addition works' );
+  is( __LINE__, 139 );
 
 And the special $_STDOUT_ and $_STDERR_ variables..
 
@@ -152,6 +155,7 @@ Beware the Ides of March!
 Really, we mean it
 OUT
   is( $_STDOUT_, "Hello, world!\n",                   '$_STDOUT_' );
+  is( __LINE__, 158 );
 
 =for example begin
 
@@ -176,6 +180,15 @@ foo
 =for testing
   use File::Spec;
   is( $Original_File, File::Spec->catfile(qw(t Tests.t)) );
+
+=for testing
+  is( __LINE__, 185, 'line in =for testing' );
+
+=begin testing
+
+  is( __LINE__, 189, 'line in =begin/end testing' );
+
+=end testing
 
 =cut
 

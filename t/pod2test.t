@@ -14,6 +14,9 @@ sub PRINT  {
     ${'main::'.$self->{var}} .= join '', @_;
 }
 
+sub OPEN  {}    # XXX Hackery in case the user redirects
+sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
+
 sub READ {}
 sub READLINE {}
 sub GETC {}
@@ -30,8 +33,9 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 {
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
-#line 91 t/Tests.t
+#line 92 t/Tests.t
 ok(2+2 == 4);
+is( __LINE__, 93 );
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -40,9 +44,9 @@ ok(2+2 == 4);
 {
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
-#line 103 t/Tests.t
+#line 104 t/Tests.t
 
-my $foo = 0;
+my $foo = 0;  is( __LINE__, 105 );
 ok( !$foo,      'foo is false' );
 ok( $foo == 0,  'foo is zero'  );
 
@@ -54,9 +58,17 @@ ok( $foo == 0,  'foo is zero'  );
 {
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
-#line 177 t/Tests.t
+#line 181 t/Tests.t
   use File::Spec;
   is( $Original_File, File::Spec->catfile(qw(t Tests.t)) );
+
+
+  is( __LINE__, 185, 'line in =for testing' );
+
+
+
+  is( __LINE__, 189, 'line in =begin/end testing' );
+
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -68,7 +80,7 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 113 t/Tests.t
+#line 114 t/Tests.t
 
   # This is an example.
   2+2 == 4;
@@ -78,7 +90,7 @@ eval q{
 
   }
 };
-is($@, '', "example from line 113");
+is($@, '', "example from line 114");
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -89,14 +101,16 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 122 t/Tests.t
+#line 124 t/Tests.t
   sub mygrep (&@) { }
+
+
   mygrep { $_ eq 'bar' } @stuff
 ;
 
   }
 };
-is($@, '', "example from line 122");
+is($@, '', "example from line 124");
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -107,24 +121,31 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 131 t/Tests.t
+#line 132 t/Tests.t
 
   my $result = 2 + 2;
+
+
+
 
 ;
 
   }
 };
-is($@, '', "example from line 131");
+is($@, '', "example from line 132");
 
 {
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
-#line 131 t/Tests.t
+#line 132 t/Tests.t
 
   my $result = 2 + 2;
 
+
+
+
   ok( $result == 4,         'addition works' );
+  is( __LINE__, 139 );
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -139,34 +160,41 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 142 t/Tests.t
+#line 144 t/Tests.t
 
   local $^W = 1;
   print "Hello, world!\n";
   print STDERR  "Beware the Ides of March!\n";
   warn "Really, we mean it\n";
+
+
+
 
 ;
 
   }
 };
-is($@, '', "example from line 142");
+is($@, '', "example from line 144");
 
 {
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
-#line 142 t/Tests.t
+#line 144 t/Tests.t
 
   local $^W = 1;
   print "Hello, world!\n";
   print STDERR  "Beware the Ides of March!\n";
   warn "Really, we mean it\n";
+
+
+
 
   is( $_STDERR_, <<OUT,       '$_STDERR_' );
 Beware the Ides of March!
 Really, we mean it
 OUT
   is( $_STDOUT_, "Hello, world!\n",                   '$_STDOUT_' );
+  is( __LINE__, 158 );
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -181,7 +209,7 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 158 t/Tests.t
+#line 161 t/Tests.t
 
   1 + 1 == 2;
 
@@ -189,7 +217,7 @@ eval q{
 
   }
 };
-is($@, '', "example from line 158");
+is($@, '', "example from line 161");
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
@@ -200,7 +228,7 @@ eval q{
   my $example = sub {
     local $^W = 0;
 
-#line 166 t/Tests.t
+#line 169 t/Tests.t
 
   print "Hello again\n";
   print STDERR "Beware!\n";
@@ -209,7 +237,7 @@ eval q{
 
   }
 };
-is($@, '', "example from line 166");
+is($@, '', "example from line 169");
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
