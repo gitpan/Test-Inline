@@ -1,187 +1,673 @@
 package Test::Inline;
 
-$VERSION = '0.16';
-
+=pod
 
 =head1 NAME
 
-Test::Inline - Inlining your tests next to the code being tested.
-
-=head1 SYNOPSIS
-
-B<LOOK AT Test::Inline::Tutorial FIRST!>
-
-   =item B<is_pirate>
-
-        @pirates = is_pirate(@arrrgs);
-
-    Go through @arrrgs and return a list of pirates.
-
-    =begin testing
-
-    my @p = is_pirate('Blargbeard', 'Alfonse', 'Capt. Hampton', 'Wesley');
-    is(@p,  2,   "Found two pirates.  ARRR!");
-
-    =end testing
-
-    =cut
-
-    sub is_pirate {
-        ....
-    }
+Test::Inline - Inlining your tests next to the code being tested
 
 =head1 DESCRIPTION
 
-B<LOOK AT Test::Inline::Tutorial FIRST!>
-
 Embedding tests allows tests to be placed near the code its testing.
-This is a nice supplement to the traditional .t files.  It's like
-XUnit, Perl-style.
+This is a nice supplement to the traditional .t files.
 
-Test::Tutorial is just documentation.  To actually get anything done
-you use pod2test.  Read the Test::Inline::Tutoral, really.
+It's like XUnit, Perl-style.
 
-A test is denoted using either "=for testing" or a "=begin/end
-testing" block.
+=head2 How does it work?
 
-   =item B<is_pirate>
+Put simply, Test::Inline lets you write small fragments of general or
+method-specific testing code, and insert it anywhere you want in your
+modules, inside a specific tagged L<POD|perlpod> segment, like the
+following.
 
-        @pirates = is_pirate(@arrrgs);
+  # A fragment of general test code
+  
+  =begin testing
+  
+  ok( -f /proc/cpuinfo, 'Host has a standard /proc/cpuinfo file' );
+  
+  =end testing
 
-    Go through @arrrgs and return a list of pirates.
+  # Completely test a single method
+  
+  =begin testing label
+  
+  # Test generation of the <label> HTML tag
+  is( My::HTML->label('foo'),        '<label>foo</label>',           '->label(simple) works' );
+  is( My::HTML->label('bar', 'foo'), '<label for="bar">foo</label>', '->label(for) works'    );
+  
+  =end testing
 
-    =begin testing
+You can add as many, or as few, of these chunks of tests as you wish.
+The key condition when writing them is that they should be conceptually
+indepdendant of each other. Each chunk of testing code should not die
+or crash if it is run before or after another chunk.
 
-    my @p = is_pirate('Blargbeard', 'Alfonse', 'Capt. Hampton', 'Wesley');
-    ok(@p == 2);
+Using C<pod2test> or another test compiler, you can then transform
+these chunks in one file, or an entire tree of modules, into a one or
+more standard L<Test::More>-based test scripts.
 
-    =end testing
+These test scripts can be executed as normal.
 
-    =cut
+=head2 What is Test::Inline good for?
 
-    sub is_pirate {
-        ....
-    }
+Firstly, Test::Inline is incredibly useful for doing ad-hoc unit testing.
 
-=head2 Code Examples
+In any large groups of modules, you can add testing code here, there and
+everywhere, anywhere you want in fact, and the next time the test compiler
+is run, a test script will just appear.
 
-Code examples in documentation are rarely tested.  Pod::Tests provides
-a way to do some testing of your examples without repeating them.
+It's also useful for systematically testing all self-contained code.
 
-A code example is denoted using "=for example begin" and "=for example
-end".
+That is, any code which can be independantly tested from external
+dependencies such as databases, and that has no side-effects on external
+systems.
 
-=for _deprecated
-Older versions used "=also begin/end example"  This still works, but it's 
-deprecated and will break many POD utilities.
+All of this code, written by multiple people, can be checked for internal
+consistency, you can check it's API, anything you like, in great detail.
 
-    =for example begin
+=head2 What is Test::Inline bad for?
 
-    use LWP::Simple;
-    getprint "http://www.goats.com";
+Test::Inline is not a complete testing solution, and there are several
+types of testing you probably DON'T want to do with it.
 
-    =for example end
+=over
 
-The code between the begin and end B<will> be displayed as
-documentation.  So it will show up in perldoc.  It will be tested to
-ensure it compiles.
+=item *
 
-Using a normal C<=for example> or C<=begin/end example> block lets you
-add code to your example that won't get displayed.  This is nice when
-you only want to show a code fragment, yet still want to ensure things
-work.
+Static testing across the entire codebase
 
-    =for example
-    sub mygrep (&@) { }
+=item *
 
-    =for example begin
+Functional testing
 
-    mygrep { $_ eq 'bar' } @stuff
+=item *
 
-    =for example end
+Tests with side-effects such as those that might change a testing database
 
-The mygrep() call would be a syntax error were the routine not
-declared with the proper prototype.  Both pieces will be considered
-part of the same example for the purposes of testing, but will only
-display the C<mygrep {...}> line.  You can also put C<=for example>
-blocks afterwards.
+=head2 Getting Started
 
-Normally, an example will only be checked to see if it compiles.  If
-you put a C<=for example_testing> afterwards, more through checking
-will be done:
+... to be completed
 
-    =for example begin
-
-      my $result = 2 + 2;
-
-    =for example end
-
-    =for example_testing
-      is( $result, 4,         'addition works' );
-
-It will work like any other embedded test.  In this case the code will
-actually be run.
-
-Finally, since many examples print their output, we trap that into
-$_STDOUT_ and $_STDERR_ variables to capture prints and warnings.
-
-    =for example begin
-
-      print "Hello, world!\n";
-      warn  "Beware the Ides of March!\n";
-
-    =for example end
-
-    =for example_testing
-      ok( $_STDOUT_ eq "Hello, world!\n" );
-      ok( $_STDERR_ eq "Beware the Ides of March!\n" );
-
-$_STDOUT_ and $_STDERR are cleared between testing blocks.
-
-=head2 Formatting
-
-The code examples and embedded tests are B<not> translated from POD,
-thus all the CE<lt>E<gt> and BE<lt>E<gt> style escapes are not valid.
-Its literal Perl code.
-
-=head2 Helpful Variables
-
-Your test will have available to it several helpful variables.
-
-=over 4
-
-=item B<$Original_File>
-
-The location of the original file which pod2test was run over, relative
-to where pod2test was run.
-
-=back
-
-
-=head1 NOTES
-
-Test::Inline has been tested and works on perl back to 5.004.
-
-
-=head1 AUTHOR
-
-Michael G Schwern E<lt>schwern@pobox.comE<gt>
-
-
-=head1 COPYRIGHT
-
-Copyright 2002 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
-
-This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
-
-See F<http://www.perl.com/perl/misc/Artistic.html>
-
-
-=head1 SEE ALSO
-
-L<Test::Inline::Tutorial>, L<pod2test>
+=head1 METHODS
 
 =cut
 
+use strict;
+use UNIVERSAL 'isa';
+use File::Spec            ();
+use Algorithm::Dependency ();
+use Test::Inline::Util    ();
+use Test::Inline::Section ();
+use Test::Inline::Script  ();
+use Class::Autouse 'Test::Inline::Handler::Extract';
+use Class::Autouse 'Test::Inline::Handler::File';
+
+# We need to act as a dependency source
+use base 'Algorithm::Dependency::Source';
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '2.00_01';
+}
+
+
+
+
+
+#####################################################################
+# Constructor and Accessors
+
+=pod
+
+=head1 METHODS
+
+=head2 new
+
+  my $Tests = Test::Inline->new(
+          verbose  => 1,
+          output   => 'auto',
+          manifest => 'auto.manifest',
+          );
+
+The C<new> constructor creates a new generation framework. Once the
+constructor has been used to create the generator, the C<add_class> method
+can be used to specify classes, or class heirachies, to generate tests for.
+
+=over 4
+
+=item *
+
+B<verbose> - The C<verbose> option causes the generator to write state and
+debugging information to STDOUT as it runs.
+
+=item *
+
+B<manifest> - The C<manifest> option, if provided, will cause a manifest
+file to be created and written to disk. The manifest file contains a list
+of all the generated test files, but listed in the order they should be
+processed to best satisfy the class-level dependency of the tests.
+
+=item *
+
+B<check_count> - The C<check_count> value controls how strictly the
+test script will watch the number of tests that have been executed.
+
+When set to false, the script does no count checking other than the
+standard total count for scripts (where all section counts are known)
+
+When set to C<1> (the default), Test::Inline does smart count checking,
+doing section-by-section checking for known-count sections B<only> when
+the total for the entire script is not known.
+
+When set to C<2> or higher, Test::Inline does full count checking,
+doing section-by-section checking for every section with a known number
+of tests.
+
+=item *
+
+B<file_content> - The C<file_content> option should be provided as a CODE
+reference, which will be passed as arguments the Test::Inline object, and
+a single Test::Inline::Script object, and should return a string
+containing the contents of the resulting test file. This will be written
+to the OutputHandler.
+
+=item *
+
+B<output> - The C<output> option provides the location of the directory
+where the tests will be written to. It should both already exist, and be
+writable. If using a customer OutputHandler, the value of output refers to
+the location B<within the OutputHandler> the files will be written to.
+
+=item *
+
+B<InputHandler> - The C<InputHandler> option, if provided, supplies an
+alternative FileHandler from which source modules are retrieved.
+
+=item *
+
+B<OuputHandler> - The C<OutputHandler> option, if provided, supplies an
+alternative FileHandler to which the resulting test scripts are written.
+
+=back
+
+Returns a new Test::Inline object on success.
+Returns C<undef> if there is a problem with one of the options.
+
+=cut
+
+# For now, the various Handlers are hard-coded
+sub new {
+	my $class  = ref $_[0] ? die '->new is a static method' : shift;
+	my %params = @_;
+
+	# Create the object
+	my $self = bless {
+		# Extensibility provided through the use of Handler classes
+		ExtractHandler => $params{ExtractHandler},
+		InputHandler   => $params{InputHandler},
+		OutputHandler  => $params{OutputHandler},
+
+		# Store the ::TestFile objects
+		Classes        => {},
+		}, $class;
+
+	# Run in verbose mode?
+	$self->{verbose} = 1 if $params{verbose};
+
+	# Generate a manifest file?
+	$self->{manifest} = $params{manifest} if $params{manifest};
+
+	# Do count checking?
+	$self->{check_count} = exists $params{check_count}
+		? $params{check_count}
+			? $params{check_count} >= 2
+				? 2 # Paranoid count checking
+				: 1 # Smart count checking
+			: 0 # No count checking
+		: 1; # Smart count checking (default)
+
+	# Use an alternative file content generator?
+	if ( $params{file_content} ) {
+		return undef unless ref $params{file_content} eq 'CODE';
+		$self->{file_content} = $params{file_content};
+	}
+
+	# Set the default Handlers
+	$self->{ExtractHandler} ||= 'Test::Inline::Handler::Extract';
+	$self->{InputHandler}   ||= Test::Inline::Handler::File->new( File::Spec->curdir );
+	$self->{OutputHandler}  ||= Test::Inline::Handler::File->new( File::Spec->curdir );
+
+	# Where to write test file to, within the context of the OutputHandler
+	$self->{output} = defined $params{output} ? $params{output} : '';
+
+	$self;
+}
+
+=pod
+
+=head2 ExtractHandler
+
+The C<ExtractHandler> accessor returns the object that will be used
+to extract the test sections from the source code.
+
+=cut
+
+sub ExtractHandler { $_[0]->{ExtractHandler} }
+
+=pod
+
+=head2 InputHandler
+
+The C<InputHandler> method returns the file handler object that will be
+used to find and load the source code.
+
+=cut
+
+sub InputHandler { $_[0]->{InputHandler} }
+
+=pod
+
+=head2 OutputHandler
+
+The C<OutputHandler> accessor returns the file handler object that the
+generated test scripts will be written to.
+
+=cut
+
+sub OutputHandler { $_[0]->{OutputHandler} }
+
+
+
+
+
+#####################################################################
+# Test::Inline Methods
+
+=pod
+
+=head2 add $file, \$source
+
+The C<add> method takes as argument a filename or a reference to a SCALAR
+containing perl code, parses it, and creates zero or more
+L<Test::Inline::Script> objects representing the test scripts that will
+be generated for that source code.
+
+Returns the number of test scripts added, which could be zero, or C<undef>
+on error.
+
+=cut
+
+sub add {
+	my $self   = shift;
+	my $source = $self->_source(shift) or return undef;
+
+	# Extract the elements from the source code
+	my $Extract = $self->ExtractHandler->new( $source )
+		or return $self->_error("Failed to create ExtractHandler");
+	my $elements = $Extract->elements or return 0;
+
+	# Parse the elements into sections
+	my $Sections = Test::Inline::Section->parse( $elements )
+		or return $self->_error("Failed to parse sections: $Test::Inline::Section::errstr");
+
+	# Split up the Sections by class
+	my %classes = ();
+	foreach my $Section ( @$Sections ) {
+		# All sections MUST have a package
+		my $context = $Section->context
+			or return $self->_error("Section does not have a package context");
+		$classes{$context} ||= [];
+		push @{$classes{$context}}, $Section;
+	}
+
+	# Convert the collection of Sections into class-specific test file objects
+	my $added = 0;
+	my $Classes = $self->{Classes};
+	foreach my $_class ( keys %classes ) {
+		# We can't safely spread tests for the same class across
+		# different files. Error if we spot a duplicate.
+		if ( $Classes->{$_class} ) {
+			return $self->_error("Caught duplicate test class");
+		}
+
+		# Create a new ::TestFile object for the collection of Sections
+		my $File = Test::Inline::Script->new($_class, $classes{$_class}, $self->{check_count})
+			or return $self->_error("Failed to create a new TestFile for '$_class'");
+		$self->_verbose("Adding $File to schedule\n");
+		$Classes->{$_class} = $File;
+		$added++;
+	}
+
+	$added++;
+}
+
+=pod
+
+=head2 add_class
+
+  $Tests->add_class( 'Foo::Bar' );
+  $Tests->add_class( 'Foo::Bar', recursive => 1 );
+
+The C<add_class> method adds a class to the list of those to have their tests
+generated. Optionally, the C<recursive> option can be provided to add not just
+the class you provide, but all classes below it as well.
+
+Returns the number of classes found with inline tests, and added, including 
+C<0> if no classes with tests are found. Returns C<undef> if an error occurs 
+while adding the class or it's children.
+
+=cut
+
+sub add_class {
+	my $self    = shift;
+	my $name    = shift or return undef;
+	my %options = @_;
+
+	# Determine the files to add
+	$self->_verbose("Checking $name\n");
+	my $files = $options{recursive}
+		? $self->InputHandler->find( $name )
+		: $self->InputHandler->file( $name );
+	return $files unless $files; # 0 or undef
+
+	# Add the files
+	my $added = 0;
+	foreach my $file ( @$files ) {
+		my $rv = $self->add( $file );
+		return undef unless defined $rv;
+		$added += $rv;
+	}
+
+	# Clear the caches
+	delete $self->{schedule};
+	delete $self->{filenames};
+
+	$added;
+}
+
+=pod
+
+=head2 classes
+
+The C<classes> method returns a list of the names of all the classes that have
+been added to the Inline object, or the null list C<()> if nothing has been
+added.
+
+=cut
+
+sub classes {
+	my $self = shift;
+	sort keys %{$self->{Classes}};
+}
+
+=pod
+
+=head2 class
+
+For a given class name, fetches the
+L<Test::Inline::Script|Test::Inline::Script> object for that class,
+if it has been added to the Inline object. Returns C<undef> if the class
+has not been added to the Inline object.
+
+=cut
+
+sub class { $_[0]->{Classes}->{$_[1]} }
+
+=pod
+
+=head2 filenames
+
+For all of the classes added, the C<filenames> method generates a map of the
+filenames that the test files for the various classes should be written to.
+
+Returns a reference to a hash with the classes as keys, and filenames as
+values. Returns C<0> if there are no files to write. Returns C<undef> on 
+error.
+
+=cut
+
+sub filenames {
+	my $self = shift;
+	return $self->{filenames} if $self->{filenames};
+
+	# Create an Algorithm::Dependency for the classes
+	my $Algorithm = Algorithm::Dependency::Ordered->new(
+		source         => $self,
+		ignore_orphans => 1,
+		) or return undef;
+
+	# Get the build schedule
+	$self->_verbose("Checking dependencies\n");
+	my $schedule = $Algorithm->schedule_all or return undef;
+
+	# Merge the test position counter with the class base names
+	my %filenames = ();
+	for ( my $i = 0; $i <= $#$schedule; $i++ ) {
+		my $class = $schedule->[$i];
+		$filenames{$class} = $self->{Classes}->{$class}->filename;
+	}
+
+	$self->{schedule}  = [ map { $filenames{$_} } @$schedule ];
+	$self->{filenames} = \%filenames;
+}
+
+=pod
+
+=head2 schedule
+
+While the C<filenames> method generates a map of the files for the various
+classes, the C<schedule> returns the list of file names in the order in which
+they should actually be executed.
+
+Returns a reference to an array containing the file names as strings. Returns
+C<0> if there are no files to write. Returns C<undef> on error.
+
+=cut
+
+sub schedule {
+	my $self = shift;
+	return $self->{schedule} if $self->{schedule};
+
+	# Generate the file names and schedule
+	$self->filenames or return undef;
+
+	$self->{schedule};
+}
+
+=pod
+
+=head2 manifest
+
+The C<manifest> generates the contents of the manifest file, if it is both
+wanted and needed.
+
+Returns the content of the manifest file as a normal string, false if it is
+either not wanted or needed, or C<undef> on error.
+
+=cut
+
+sub manifest {
+	my $self = shift;
+
+	# Do we need to create a file?
+	my $schedule = $self->schedule or return undef;
+	return '' unless $self->{manifest};
+	return '' unless @$schedule;
+
+	# Each manifest entry should be listed by it's path relative to
+	# the location of the manifest file.
+	my $manifest_dir  = (File::Spec->splitpath($self->{manifest}))[1];
+	my $relative_path = Test::Inline::Util->relative(
+		$manifest_dir => $self->{output},
+		);
+	return undef unless defined $relative_path;
+
+	# Generate and merge the manifest entries
+	my @manifest = @$schedule;
+	if ( length $relative_path ) {
+		@manifest = map { File::Spec->catfile( $relative_path, $_ ) } @manifest;
+	}
+	join '', map { "$_\n" } @manifest;
+}
+
+=pod
+
+=head2 save
+
+  $Tests->save;
+
+The C<save> method generates the test files for all classes, and saves them
+to the test directory.
+
+Returns the number of test files generates. Returns C<undef> on error.
+
+=cut
+
+sub save {
+	my $self = shift;
+
+	# Get the file names to save to
+	my $filenames = $self->filenames;
+	return $filenames unless $filenames; # undef or 0
+
+	# Write the manifest if needed
+	my $manifest = $self->manifest;
+	return undef unless defined $manifest;
+	if ( $manifest ) {
+		if ( $self->OutputHandler->write( $self->{manifest}, $manifest ) ) {
+			$self->_verbose( "Wrote manifest file '$self->{manifest}'\n" );
+		} else {
+			$self->_verbose( "Failed to write manifest file '$self->{manifest}'\n" );
+			return undef;
+		}
+	}
+
+	# Write the files
+	my $written = 0;
+	foreach my $class ( sort keys %$filenames ) {
+		$self->_save_class( $class ) or return undef;
+		$written++;
+	}
+
+	$written;
+}
+
+sub _save_class {
+	my $self      = shift;
+	my $class     = shift or return undef;
+	my $filenames = $self->filenames or return undef;
+	my $filename  = $filenames->{$class} or return undef;
+	local $| = 1;
+
+	# Get the file content
+	$self->_verbose("Generating $filename for $class...");
+	my $content = defined $self->{file_content}
+		# Use the custom file content generator
+		? &{$self->{file_content}}( $self, $self->{Classes}->{$class} )
+		# Use the default file content generator
+		: $self->{Classes}->{$class}->file_content;
+	unless ( defined $content ) {
+		$self->_verbose("Failed\n");
+		return undef;
+	}
+
+	# Write the file
+	$self->_verbose("Saving...");
+	if ( $self->{output} ) {
+		$filename = File::Spec->catfile( $self->{output}, $filename );
+	}
+	unless ( $self->OutputHandler->write( $filename, $content ) ) {
+		$self->_verbose("Failed\n");
+		return undef;
+	}
+	$self->_verbose("Done\n");
+
+	1;
+}
+
+
+
+
+
+#####################################################################
+# Implement the Algorithm::Dependency::Source Interface
+
+sub load { 1 }
+sub item { $_[0]->{Classes}->{$_[1]} }
+sub items {
+	my $classes = shift->{Classes};
+	map { $classes->{$_} } sort keys %$classes;
+}
+
+
+
+
+
+#####################################################################
+# Support Methods
+
+# Take source code directly, or load it from a file
+sub _source {
+	my $self = shift;
+	return undef unless defined $_[0];
+	return shift if ref $_[0] eq 'SCALAR';
+	return undef if ref $_[0];
+	$self->InputHandler->read(shift);
+}
+
+# Print a message if we are in verbose mode
+sub _verbose {
+	my $self = shift;
+	return 1 unless $self->{verbose};
+	print @_;
+}
+
+# Warn and return
+sub _error {
+	my $self = shift;
+	$self->_verbose(map { "Error: $_" } @_);
+	undef;
+}
+
 1;
+
+=pod
+
+=head1 TO DO
+
+- Add support for C<example> sections
+
+- Add support for C<=for> sections
+
+=head1 SUPPORT
+
+Bugs should always be submitted via the CPAN bug tracker
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Inline>
+
+Contacts regarding professional support, assistance, or customisations
+for large scale uses of Test::Inline is available from L<http://phase-n.com/>.
+
+For other issues, contact the maintainer.
+
+=head1 AUTHOR
+
+Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+
+=head1 ACKNOWLEDGEMENTS
+
+Thank you to Phase N (L<http://phase-n.com/>) for permitting
+the open sourcing and release of this distribution.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 - 2005 Phase N Austalia. All rights reserved.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

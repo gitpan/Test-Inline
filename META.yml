@@ -1,12 +1,23 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Test-Inline
-version:      0.16
-version_from: lib/Test/Inline.pm
-installdirs:  site
-requires:
-    Test::Harness:                 1.22
-    Test::More:                    0.33
-
+name: Test-Inline
+version: 2.00_01
+abstract: Inlining your tests next to the code being tested
+author: Adam Kennedy<adam@ali.as>
+license: unknown
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.21
+build_requires:
+  Test::More: 0.47
+  Test::ClassAPI: 1.02
+requires:
+  perl: 5.005
+  File::Spec: 0.82
+  List::Util: 1.11
+  File::Slurp: 9999.04
+  File::Find::Rule: 0.26
+  Algorithm::Dependency: 1.02
+  Class::Autouse: 1.15
+  File::Flat: 0.95
+  Getopt::Long: 2.34
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,140 +1,108 @@
-#!perl
+#!/usr/bin/perl
 
-use 5.004;
+# pod2test - Generate test scripts for a tree of modules
+
+# Note to testers, this is a half-assed hack job. It needs to be
+# changed to closer match the old pod2test.
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.09';
+use Getopt::Long ();
+use File::Slurp ();
+use Test::Inline2 ();
+use File::Find::Rule ();
+use constant FFR => 'File::Find::Rule';
 
-use File::Spec;
-use Pod::Tests;
-use Symbol;
+# Get options
+my $init = '';
+Getopt::Long::GetOptions( 'init=s' => \$init );
 
-=pod
-
-=head1 NAME
-
-pod2test - Convert embedded tests and code examples to .t files
-
-=head1 SYNOPSIS
-
-  pod2test [-Mmodule] [input [output]]
-
-=head1 DESCRIPTION
-
-B<pod2test> is a front-end for Test::Inline.  It generates MakeMaker
-style .t testing files from embedded tests and code examples.
-
-If output is not specified, the resulting .t file will go to STDOUT.
-Otherwise, it will go to the given output file.  If input is not
-given, it will draw from STDIN.
-
-If the given file contains no tests or code examples, no output will
-be given, no output file will be created and pod2test will exit with
-1.
-
-The Test::More module is made available to the testing blocks using
-the 'no_plan' feature.  Any further modules which should be used are
-specified with -M. B<UNIMPLEMENTED>
-
-=cut
-
-my($infile, $outfile) = @ARGV;
-my($infh,$outfh);
-
-if( defined $infile ) {
-    $infh = gensym;
-    open($infh, $infile) or 
-      die "Can't open the POD file $infile: $!";
-}
-else {
-    $infh = \*STDIN;
+# Load the initialisation code
+if ( $init ) {
+	error("Initialisation file '$init' does not exist") unless -f $init;
+	error("No permissions on initialisation file '$init'") unless -f $init;
+	$init = File::Slurp::read_file( $init );
+	$init =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 }
 
-my $p = Pod::Tests->new;
-$p->parse_fh($infh);
+# Input directory
+my $input  = shift @ARGV;
+error("Input directory does not exist") unless -d $input;
+error("No permissions on input directory") unless -r $input;
+error("No permissions on input directory") unless -x $input;
 
-# XXX Hack to put the filename into the #line directive
-$p->{file} = $infile || '';
+# Output directory	
+my $output = shift @ARGV;
+error("Output directory does not exist") unless -d $output;
+error("No permissions on output directory") unless -w $output;
+error("No permissions on output directory") unless -x $output;
 
-my @tests    = $p->build_tests($p->tests);
-my @examples = $p->build_examples($p->examples);
+# Create the Test::Inline2 object
+my $Inline = Test::Inline2->new(
+	verbose => 1,
+	output  => $output,
+	$init ? (file_content => \&file_content) : (),
+	) or die "Failed to create Test::Inline2 object";
 
-exit 1 unless @tests or @examples;
+# Find all the modules to add
+my $Rule = FFR->file->name('*.pm');
+my @files = $Rule->in( $input ) or error("No .pm files found to add");
+print "Found " . scalar(@files) . " file(s) to check for tests in\n";
 
-
-if( defined $outfile) {
-    $outfh = gensym;
-    open($outfh, ">$outfile") or
-      die "Can't open the test file $outfile: $!";
-}
-else {
-    $outfh = \*STDOUT;
-}
-
-
-my $perl = $^X;  # XXX eventually this will be smarter.
-print $outfh <<"TEST";
-#!$perl -w
-TEST
-
-my $original_file = File::Spec->abs2rel($infile);
-
-print $outfh sprintf <<'TEST', $original_file;
-
-use Test::More 'no_plan';
-
-package Catch;
-
-sub TIEHANDLE {
-    my($class, $var) = @_;
-    return bless { var => $var }, $class;
+foreach my $file ( @files ) {
+	unless ( defined $Inline->add( $file ) ) {
+		error("Failed to add '$file'");
+	}
 }
 
-sub PRINT  {
-    my($self) = shift;
-    ${'main::'.$self->{var}} .= join '', @_;
-}
+# Generate and save the files
+$Inline->save or error("Failed to generate and save test files");
 
-sub OPEN  {}    # XXX Hackery in case the user redirects
-sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
+print "Done\n\n";
 
-sub READ {}
-sub READLINE {}
-sub GETC {}
-sub BINMODE {}
+exit(0);
 
-my $Original_File = '%s';
+# A replacement file_content for when we want to add init content
+sub file_content {
+	my ($Inline, $File) = @_;
 
-package main;
+	# Get the merged content
+	my $content = $File->merged_content;
+	return undef unless defined $content;
 
-# pre-5.8.0's warns aren't caught by a tied STDERR.
-$SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
-tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
-tie *STDERR, 'Catch', '_STDERR_' or die $!;
+	# Determine a plan
+	my $tests = $File->tests;
+	my $plan  = defined $tests
+		? "tests => $tests"
+		: "'no_plan'";
 
-TEST
+	# Wrap the merged contents with the rest of the test
+	# file infrastructure.
+	my $file = <<"END_TEST";
+#!/usr/bin/perl -w
 
-foreach my $test (@tests, @examples) {
-    print $outfh "$test\n";
-}
+use strict;
+use Test::More $plan;
+\$| = 1;
+
+# Common initialisation
+$init
 
 
-=pod
+$content
 
-=head1 BUGS and CAVEATS
 
-This is a very simple rough cut.  It only does very rudimentary tests
-on the examples.
-
-=head1 AUTHOR
-
-Michael G Schwern <schwern@pobox.com>
-
-=head1 SEE ALSO
-
-L<Test::Inline>
-
-=cut
 
 1;
+END_TEST
+
+	$file;
+}
+
+
+
+
+sub error {
+	my $message = shift;
+	print "\nError: $message\n";
+	exit(1);
+}
