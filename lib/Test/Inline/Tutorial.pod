@@ -125,11 +125,12 @@ file.  To make it do it as part of "make test" you need this:
                              keys %{$self->{MAN3PODS}})
             {
                 (my $test = $pod) =~ s/\.(pm|pod)$//;
+                $test =~ s|/|-|g;
                 $test =~ s/^lib\W//;
                 $test =~ s/\W/-/;
                 $test = "embedded-$test.t";
                 $out .= "\t$self->{NOECHO}\$(POD2TEST_EXE) ".
-                        "$pod t/$test \\\n";
+                        "$pod t/$test\n";
             }
 
             return $out;

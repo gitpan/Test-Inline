@@ -1,5 +1,11 @@
 Revision history for Perl extension Pod::Tests.
 
+0.11  
+    - Fixed a bug in the testifypods example in Test::Inline::Tutorial
+    * pod2test will not generate a test file for POD which has no
+      embedded tests.
+    * Testing code examples no longer considered experimental
+
 0.10  Wed Aug 29 01:13:41 EDT 2001
     * Pod::Tests is now officially named Test::Inline
     * Pod::Tests::Tutorial renamed Test::Inline::Tutorial

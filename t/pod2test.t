@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-use Test::More no_plan;
+use Test::More 'no_plan';
 
 package Catch;
 

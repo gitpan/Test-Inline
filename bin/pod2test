@@ -4,7 +4,7 @@ use 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use Pod::Tests;
 use Symbol;
@@ -28,6 +28,9 @@ If output is not specified, the resulting .t file will go to STDOUT.
 Otherwise, it will go to the given output file.  If input is not
 given, it will draw from STDIN.
 
+If the given file contains no tests or code examples, no output will
+be given and no output file will be created.
+
 The Test::More module is made available to the testing blocks using
 the 'no_plan' feature.  Any further modules which should be used are
 specified with -M. B<UNIMPLEMENTED>
@@ -46,15 +49,6 @@ else {
     $infh = \*STDIN;
 }
 
-if( defined $outfile) {
-    $outfh = gensym;
-    open($outfh, ">$outfile") or
-      die "Can't open the test file $outfile: $!";
-}
-else {
-    $outfh = \*STDOUT;
-}
-
 my $p = Pod::Tests->new;
 $p->parse_fh($infh);
 
@@ -64,6 +58,18 @@ $p->{file} = $infile || '';
 my @tests    = $p->build_tests($p->tests);
 my @examples = $p->build_examples($p->examples);
 
+exit unless @tests or @examples;
+
+
+if( defined $outfile) {
+    $outfh = gensym;
+    open($outfh, ">$outfile") or
+      die "Can't open the test file $outfile: $!";
+}
+else {
+    $outfh = \*STDOUT;
+}
+
 
 my $perl = $^X;  # XXX eventually this will be smarter.
 print $outfh <<"TEST";
@@ -72,7 +78,7 @@ TEST
 
 print $outfh <<'TEST';
 
-use Test::More no_plan;
+use Test::More 'no_plan';
 
 package Catch;
 

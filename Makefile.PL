@@ -15,10 +15,11 @@ $PACKAGE = 'Test::Inline';
 ($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
 $LAST_API_CHANGE = 0.10;
 
-eval "require Pod::Tests;" || eval "require Test::Inline;";
+eval { require Test::Inline; } || eval { require Pod::Tests };
 
 unless ($@) { # Make sure we did find the module.
-    warn <<API_CHANGE;
+    if( ${$PACKAGE.'::VERSION'} < $LAST_API_CHANGE ) {
+        warn <<API_CHANGE;
 *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 Three things.  See the Test::Inline man page for full details.
 
@@ -47,7 +48,8 @@ Check your tests and modify them now.
 *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 API_CHANGE
 
-    sleep 10;
+        sleep 10;
+    }
 }
 
 
@@ -93,3 +95,7 @@ WriteMakefile(
 # Generating pod2test's tests.
 print "Running pod2test.\n";
 system(qq{$^X -I"lib" bin/pod2test t/Tests.t t/pod2test.t});
+
+# Test that pod2test generates no file when given something that has no
+# tests.
+system(qq{$^X -I"lib" bin/pod2test MANIFEST t/i_should_not_be_written.t});
