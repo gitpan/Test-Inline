@@ -85,6 +85,8 @@ Functional testing
 
 Tests with side-effects such as those that might change a testing database
 
+=back
+
 =head2 Getting Started
 
 ... to be completed
@@ -109,7 +111,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_02';
+	$VERSION = '2.00_03';
 }
 
 

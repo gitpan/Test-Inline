@@ -1,5 +1,16 @@
 Revision history for Perl extension Test::Inline
 
+2.00_03 Mon Mar 21 2005
+	- Forgot to update Changes in 2.00_02
+	- Added automatic inclusion of 99_pod.t to my build script,
+	  as recommended by CPANTS
+	- Fixed a POD bug in Inline.pm
+
+2.00_02 Mon Mar 21 2005
+	- Moving some things around to make Test::Inline less
+	  oriented around classes, and made adding things a bit
+	  smarter.
+
 2.00_01 Fri Mar 18 2005
 	- Moved from PCPP (Phase N private CPAN repository) to Open Source
 	  repository.

@@ -37,3 +37,4 @@ t/05_check_count.t
 t/06_multifile.t
 t/07_add_directory.t
 t/08_add_all.t
+t/99_pod.t

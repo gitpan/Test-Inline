@@ -38,7 +38,7 @@ use Class::Autouse 'File::Find::Rule';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_02';
+	$VERSION = '2.00_03';
 }
 
 
