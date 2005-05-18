@@ -24,7 +24,7 @@ use File::Slurp ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_05';
+	$VERSION = '2.00_06';
 }
 
 

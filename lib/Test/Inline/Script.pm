@@ -28,7 +28,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_05';
+	$VERSION = '2.00_06';
 }
 
 # Special case, for when doing unit tests ONLY.
@@ -84,7 +84,7 @@ sub new {
 	if ( $missing ) {
 		foreach ( @$missing ) {
 			next if $NO_MISSING_DEPENDENCIES_WARNING;
-			warn "Warning: Missing dependency '$_' in $self->{class}";
+			print "Warning: Missing dependency '$_' in $self->{class}\n";
 		}
 	}
 

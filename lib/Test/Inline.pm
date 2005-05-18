@@ -8,7 +8,8 @@ Test::Inline - Inlining your tests next to the code being tested
 
 =head1 DESCRIPTION
 
-Embedding tests allows tests to be placed near the code its testing.
+Embedding tests allows tests to be placed near the code it's testing.
+
 This is a nice supplement to the traditional .t files.
 
 It's like XUnit, Perl-style.
@@ -40,22 +41,22 @@ following.
 
 You can add as many, or as few, of these chunks of tests as you wish.
 The key condition when writing them is that they should be conceptually
-indepdendant of each other. Each chunk of testing code should not die
+independant of each other. Each chunk of testing code should not die
 or crash if it is run before or after another chunk.
 
-Using C<pod2test> or another test compiler, you can then transform
-these chunks in one file, or an entire tree of modules, into a one or
-more standard L<Test::More>-based test scripts.
+Using C<inline2test> or another test compiler, you can then transform
+these chunks in a test script, or an entire tree of modules into a complete
+set of standard L<Test::More>-based test scripts.
 
-These test scripts can be executed as normal.
+These test scripts can then be executed as normal.
 
 =head2 What is Test::Inline good for?
 
 Firstly, Test::Inline is incredibly useful for doing ad-hoc unit testing.
 
 In any large groups of modules, you can add testing code here, there and
-everywhere, anywhere you want in fact, and the next time the test compiler
-is run, a test script will just appear.
+everywhere, anywhere you want. The next time the test compiler is run, a
+test script will just appear.
 
 It's also useful for systematically testing all self-contained code.
 
@@ -63,13 +64,14 @@ That is, any code which can be independantly tested from external
 dependencies such as databases, and that has no side-effects on external
 systems.
 
-All of this code, written by multiple people, can be checked for internal
-consistency, you can check it's API, anything you like, in great detail.
+All of this code, written by multiple people, can then have one single set
+of test files generated. You can check all the bits and pieces of a large
+API, or anything you like, in fine detail.
 
 =head2 What is Test::Inline bad for?
 
 Test::Inline is not a complete testing solution, and there are several
-types of testing you probably DON'T want to do with it.
+types of testing you probably DON'T want to use it for.
 
 =over
 
@@ -111,7 +113,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_05';
+	$VERSION = '2.00_06';
 }
 
 
@@ -133,25 +135,18 @@ BEGIN {
           manifest => 'auto.manifest',
           );
 
-The C<new> constructor creates a new generation framework. Once the
+The C<new> constructor creates a new test generation framework. Once the
 constructor has been used to create the generator, the C<add_class> method
 can be used to specify classes, or class heirachies, to generate tests for.
-
-=over 4
-
-=item *
 
 B<verbose> - The C<verbose> option causes the generator to write state and
 debugging information to STDOUT as it runs.
 
-=item *
-
 B<manifest> - The C<manifest> option, if provided, will cause a manifest
 file to be created and written to disk. The manifest file contains a list
-of all the generated test files, but listed in the order they should be
-processed to best satisfy the class-level dependency of the tests.
-
-=item *
+of all the test files generated, but listed in the prefered order they
+should be processed to best satisfy the class-level dependency of the
+tests.
 
 B<check_count> - The C<check_count> value controls how strictly the
 test script will watch the number of tests that have been executed.
@@ -159,42 +154,34 @@ test script will watch the number of tests that have been executed.
 When set to false, the script does no count checking other than the
 standard total count for scripts (where all section counts are known)
 
-When set to C<1> (the default), Test::Inline does smart count checking,
+When set to C<1> (the default), C<Test::Inline> does smart count checking,
 doing section-by-section checking for known-count sections B<only> when
 the total for the entire script is not known.
 
-When set to C<2> or higher, Test::Inline does full count checking,
+When set to C<2> or higher, C<Test::Inline> does full count checking,
 doing section-by-section checking for every section with a known number
 of tests.
 
-=item *
-
 B<file_content> - The C<file_content> option should be provided as a CODE
-reference, which will be passed as arguments the Test::Inline object, and
-a single Test::Inline::Script object, and should return a string
+reference, which will be passed as arguments the C<Test::Inline> object,
+and a single L<Test::Inline::Script> object, and should return a string
 containing the contents of the resulting test file. This will be written
-to the OutputHandler.
-
-=item *
+to the C<OutputHandler>.
 
 B<output> - The C<output> option provides the location of the directory
 where the tests will be written to. It should both already exist, and be
-writable. If using a customer OutputHandler, the value of output refers to
-the location B<within the OutputHandler> the files will be written to.
-
-=item *
+writable. If using a custom C<OutputHandler>, the value of C<output> should
+refer to the location B<within the OutputHandler> the files will be written
+to.
 
 B<InputHandler> - The C<InputHandler> option, if provided, supplies an
-alternative FileHandler from which source modules are retrieved.
-
-=item *
+alternative C<FileHandler> from which source modules are retrieved.
 
 B<OuputHandler> - The C<OutputHandler> option, if provided, supplies an
-alternative FileHandler to which the resulting test scripts are written.
+alternative C<FileHandler> to which the resulting test scripts are written.
 
-=back
+Returns a new C<Test::Inline> object on success.
 
-Returns a new Test::Inline object on success.
 Returns C<undef> if there is a problem with one of the options.
 
 =cut
@@ -289,7 +276,7 @@ sub OutputHandler { $_[0]->{OutputHandler} }
 
 =pod
 
-=head2 add $file, \$source, $Handle
+=head2 add $file, $directory, \$source, $Handle
 
 The C<add> method is a parameter-sensitive method for adding something
 to the build schedule.
@@ -365,7 +352,7 @@ sub add_class {
 
 =head2 add_all
 
-The C<add_all> method will search the InputHandler for all *.pm files,
+The C<add_all> method will search the C<InputHandler> for all *.pm files,
 and add them to the generation set.
 
 Returns the total number of test scripts added, which may be zero, or
@@ -460,10 +447,9 @@ sub classes {
 
 =head2 class
 
-For a given class name, fetches the
-L<Test::Inline::Script|Test::Inline::Script> object for that class,
-if it has been added to the Inline object. Returns C<undef> if the class
-has not been added to the Inline object.
+For a given class name, fetches the L<Test::Inline::Script> object for that
+class, if it has been added to the C<Test::Inline> object. Returns C<undef> if the
+class has not been added to the C<Test::Inline> object.
 
 =cut
 
@@ -477,8 +463,11 @@ For all of the classes added, the C<filenames> method generates a map of the
 filenames that the test files for the various classes should be written to.
 
 Returns a reference to a hash with the classes as keys, and filenames as
-values. Returns C<0> if there are no files to write. Returns C<undef> on 
-error.
+values.
+
+Returns C<0> if there are no files to write.
+
+Returns C<undef> on  error.
 
 =cut
 
@@ -515,8 +504,11 @@ While the C<filenames> method generates a map of the files for the various
 classes, the C<schedule> returns the list of file names in the order in which
 they should actually be executed.
 
-Returns a reference to an array containing the file names as strings. Returns
-C<0> if there are no files to write. Returns C<undef> on error.
+Returns a reference to an array containing the file names as strings.
+
+Returns C<0> if there are no files to write.
+
+Returns C<undef> on error.
 
 =cut
 
@@ -537,7 +529,7 @@ sub schedule {
 The C<manifest> generates the contents of the manifest file, if it is both
 wanted and needed.
 
-Returns the content of the manifest file as a normal string, false if it is
+Returns the contents of the manifest file as a normal string, false if it is
 either not wanted or needed, or C<undef> on error.
 
 =cut
@@ -573,9 +565,9 @@ sub manifest {
   $Tests->save;
 
 The C<save> method generates the test files for all classes, and saves them
-to the test directory.
+to the C<output> directory.
 
-Returns the number of test files generates. Returns C<undef> on error.
+Returns the number of test files generated. Returns C<undef> on error.
 
 =cut
 
@@ -722,8 +714,8 @@ Bugs should always be submitted via the CPAN bug tracker
 
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Inline>
 
-Contacts regarding professional support, assistance, or customisations
-for large scale uses of Test::Inline is available from L<http://phase-n.com/>.
+Professional support, assistance, or customisations for large scale
+uses of Test::Inline are available from L<http://phase-n.com/>.
 
 For other issues, contact the maintainer.
 

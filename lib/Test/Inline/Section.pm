@@ -102,7 +102,7 @@ use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_05';
+	$VERSION = '2.00_06';
 	$errstr  = '';
 }
 

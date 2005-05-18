@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Spec::Functions ':ALL';
+use Getopt::Long;
+use Test::Inline;
+use File::Slurp ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.01';
+}
+
+
+
+
+
+#####################################################################
+# Collect Options
+
+my $input   = '';
+my $header  = '';
+my $output  = '';
+my $execute = '';
+my $verbose = '';
+
+my $rv = GetOptions(
+	"input=s"  => \$input,
+	"output=s" => \$output,
+	"header=s" => \$header,
+	"execute"  => \$execute,
+	"verbose"  => \$verbose,
+	);
+exit(0) unless $rv;
+
+
+
+
+
+#####################################################################
+# Prepare Job
+
+# Create the Test::Inline object
+my %args = ();
+if ( $input ) {
+	unless ( -d $input ) {
+		print "The input directory '$input' does not exist\n";
+		exit(0);
+	}
+}
+if ( $output ) {
+	unless ( -d $output ) {
+		print "The output directory '$output' does not exist\n";
+		exit(0);
+	}
+	unless ( -w $output ) {
+		print "No write permissions to output directory '$output'\n";
+		exit(0);
+	}
+	$args{output} = $output;
+}
+if ( $header ) {
+	unless ( -f $header ) {
+		print "Template file '$header' does not exists\n";
+		exit(0);
+	}
+	unless ( -r $header ) {
+		print "No permissions to read Template file '$header'\n";
+		exit(0);
+	}
+	$header = File::Slurp::read_file( $header )
+		or die "Failed to read in the header file";
+	$args{file_content} = sub {
+		my $Object = shift;
+		my $Script = shift;
+		return $header . $Script->merged_content;
+		};
+}
+if ( $verbose ) {
+	$args{verbose} = 1;
+}
+
+
+
+
+
+#####################################################################
+# Generate the Test Scripts
+
+my $Inline = Test::Inline->new( %args )
+	or die "Failed to create Test::Inline object";
+if ( $input ) {
+	defined($Inline->add( $input ))
+		or die "Error during ->add call";
+} else {
+	defined($Inline->add_all)
+		or die "Error during ->add_all call";
+}
+defined($Inline->save)
+	or die "Error while saving scripts";
+
+exit(0) unless $execute;
+
+
+
+
+
+#####################################################################
+# Execute Scripts
+
+my $schedule = $Inline->schedule;
+unless ( defined $schedule ) {
+	die "Error getting schedule";
+}
+unless ( $schedule ) {
+	print "Nothing to execute\n";
+	exit(0);
+}
+
+eval "use ExtUtils::Command::MM;";
+die $@ if $@;
+
+@ARGV = map { catfile($output, $_) } @$schedule;
+test_harness(0);
