@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Inline
 
+2.00_08 Fri May 21 2005
+	- Adding a no_index to prevent bad things being indexed
+
 2.00_07 Fri May 21 2005
 	- Set inline2test to actually install
 	- Remove pod2test, since I'm leaving it as is.
