@@ -18,6 +18,8 @@ requires       ( 'Getopt::Long'          => '2.34'    );
 build_requires ( 'Test::More'            => '0.47'    );
 build_requires ( 'Test::ClassAPI'        => '1.02'    );
 
+install_script ( 'bin/inline2test'                    );
+
 auto_install();
 
 &WriteAll;

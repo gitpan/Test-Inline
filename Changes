@@ -1,5 +1,13 @@
 Revision history for Perl extension Test::Inline
 
+2.00_07 Fri May 21 2005
+	- Set inline2test to actually install
+	- Remove pod2test, since I'm leaving it as is.
+
+2.00_06 Thu May 20 2005
+	- Added a few more bug fixes, and made the warning only a print,
+	  and not a "true" warning.
+
 2.00_05 Sat Mar 26 2005
 	- Added support for =for example begin -> =for example end blocks
 
