@@ -1,5 +1,5 @@
 name: Test-Inline
-version: 2.00_10
+version: 2.001
 abstract: Inlining your tests next to the code being tested
 author: Adam Kennedy<adam@ali.as>
 license: unknown

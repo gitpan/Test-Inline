@@ -28,7 +28,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_10';
+	$VERSION = '2.001';
 }
 
 # Special case, for when doing unit tests ONLY.
