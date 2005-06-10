@@ -102,7 +102,7 @@ use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_09';
+	$VERSION = '2.00_10';
 	$errstr  = '';
 }
 
@@ -187,21 +187,15 @@ sub new {
 	}
 
 	# Handle setup sections via =begin test setup or =begin testing SETUP
-	my $setup = '';
 	if ( @parts == 2 and $parts[0] eq 'test' and $parts[1] eq 'setup' ) {
-		
-		$setup = 1;
-	}
-	if ( @parts == 2 and $parts[0] eq 'testing' and $parts[1] eq 'SETUP' ) {
-		$setup = 1;
-	}
-	if ( $setup ) {
 		$self->{setup} = 1;
-		return $self;
+	}
+	if ( @parts >= 2 and $parts[0] eq 'testing' and $parts[1] eq 'SETUP' ) {
+		$self->{setup} = 1;
 	}
 
 	# Any other form of =begin test is not allowed
-	if ( $parts[0] eq 'test' ) {
+	if ( $parts[0] eq 'test' and ! $self->{setup} ) {
 		# Unknown =begin test line
 		return $class->_error("Unsupported '=begin test' line '$begin'");
 	}
@@ -220,9 +214,13 @@ sub new {
 
 	# The first word is our name and must match the perl
 	# format for a method name.
-	$self->{name} = shift @parts;
-	unless ( $self->{name} =~ /^[^\W\d]\w*$/ ) {
-		return $class->_error("'$self->{name}' is not a valid test name: $begin");
+	if ( $self->{setup} ) {
+		shift @parts;
+	} else {
+		$self->{name} = shift @parts;
+		unless ( $self->{name} =~ /^[^\W\d]\w*$/ ) {
+			return $class->_error("'$self->{name}' is not a valid test name: $begin");
+		}
 	}
 	return $self unless @parts;
 
@@ -237,6 +235,9 @@ sub new {
 	# another module that should be part of the testing process.
 	foreach my $part ( @parts ) {
 		if ( $part =~ /^[^\W\d]\w*$/ ) {
+			if ( $self->setup ) {
+				return $class->_error("SETUP sections can only have class dependencies");
+			}
 			$self->{after}->{$part} = 1;
 		} elsif ( $part =~ /::/ ) {
 			$part =~ s/::$//; # Strip trailing ::
@@ -343,7 +344,7 @@ sub _trim_empty_lines {
 
   my $SectionList = Test::Inline::Section( @elements );
 
-Since version 1.50 Test::Inline has been extracting package statements
+Since version 1.50 L<Test::Inline> has been extracting package statements
 so that as the sections are extracted, we can determine which sections
 belong to which packages, and seperate them accordingly.
 

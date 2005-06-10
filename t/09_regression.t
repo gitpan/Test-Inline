@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use Class::Autouse ':devel';
-use Test::More tests => 3;
+use Test::More tests => 7;
 use Test::Inline ();
 
 
@@ -60,4 +60,30 @@ chdir catdir( 't.data', '09_regression' ) or die "Failed to change to test direc
 	}
 
 	1;
+}
+
+
+
+
+#####################################################################
+# Regression tests for anonymous bug
+# "=begin testing SETUP after DDS::Info 1" is not a setup section
+
+{
+	my $POD = <<'END_POD';
+=begin testing SETUP after DDS::Info 1
+
+# This is ok
+ok( 1, 'This is true' );
+
+=end testing
+END_POD
+
+	# Create the Section
+	my $Section = Test::Inline::Section->new( $POD );
+	isa_ok( $Section, 'Test::Inline::Section' );
+
+	ok( $Section->setup, 'Is a setup section' );
+	ok( ! $Section->example, 'Is not an example section' );
+	is( $Section->name, '', 'Does not have a name' );
 }

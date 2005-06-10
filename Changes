@@ -1,6 +1,10 @@
 Revision history for Perl extension Test::Inline
 
-2.00_09 Tue May 31 2005
+2.00_10 Sat Jun 11 2005
+	- Making sure =begin testing SETUP behaves completely like the
+	  previous =begin test setup sections
+
+2.00_09 Fri Jun 10 2005
 	- Adding Test::Inline::Handler::File::VCS to support automatically
 	  adding output scripts to version control system, if they have one.
 	- Added a --vcs flag to inline2test to use Test::Inline::Handler::File::VCS
