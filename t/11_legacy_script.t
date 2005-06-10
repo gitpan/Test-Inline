@@ -62,7 +62,7 @@ is(@p,  2,   "Found two pirates.  ARRR!");
 
 
 # =for example begin
-$::__tc = Test::Builder->current_test;
+$::__tc = Test::Builder->new->current_test;
 {
 eval q{
   my $example = sub {
@@ -73,7 +73,7 @@ eval q{
 };
 is($@, '', 'Example 1 compiles cleanly');
 }
-is( Test::Builder->current_test, $::__tc + 1,
+is( Test::Builder->new->current_test, $::__tc + 1,
 	'1 test was run in the section' );
 
 

@@ -28,7 +28,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.001';
+	$VERSION = '2.002';
 }
 
 # Special case, for when doing unit tests ONLY.
@@ -325,9 +325,9 @@ sub _wrap_content {
 		my $increase = $Section->tests - 1;
 		my $were     = $increase == 1 ? 'test was' : 'tests were';
 		my $section  = 
-		$code = "\$::__tc = Test::Builder->current_test;\n"
+		$code = "\$::__tc = Test::Builder->new->current_test;\n"
 		      . $code
-		      . "is( Test::Builder->current_test, \$::__tc"
+		      . "is( Test::Builder->new->current_test, \$::__tc"
 		        . ($increase ? " + $increase" : '')
 		        . ",\n"
 		      . "\t'$increase $were run in the section' );\n";

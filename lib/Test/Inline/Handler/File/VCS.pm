@@ -21,7 +21,7 @@ use base 'Test::Inline::Handler::File';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.001';
+	$VERSION = '2.002';
 }
 
 

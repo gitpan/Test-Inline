@@ -8,7 +8,7 @@ use strict;
 use File::Spec::Functions ':ALL';
 use vars qw{$VERSION};
 BEGIN {
-$VERSION = '2.001';
+$VERSION = '2.002';
 }
 sub shorten {
 my $class = ref $_[0] ? ref shift : shift;
