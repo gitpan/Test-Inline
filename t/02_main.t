@@ -23,7 +23,7 @@ my $example = File::Spec->catfile( 't.data', 'example' );
 my $testfile = 'foo_bar.t';
 
 my $PODCONTENT = <<'END_TEST';
-# =begin test setup 0
+# =begin testing SETUP 0
 my $Foo = Foo::Bar->new();
 
 
@@ -86,14 +86,14 @@ foreach ( @$elements ) {
 # Try to parse each of the sections
 my $Setup = Test::Inline::Section->new( shift @$elements );
 isa_ok( $Setup, 'Test::Inline::Section' );
-ok(   $Setup->setup, '=begin test setup: ->setup returns true' );
+ok(   $Setup->setup, '=begin testing SETUP: ->setup returns true' );
 is(   $Setup->context, undef, '->context is false' );
-ok( ! $Setup->name, '=begin test setup: ->name returns false' );
-ok( ! $Setup->anonymous, '=begin test setup: ->anonymous returns false' );
-is_deeply( [ $Setup->depends ], [], '=begin test setup: ->depends returns null list' );
+ok( ! $Setup->name, '=begin testing SETUP: ->name returns false' );
+ok( ! $Setup->anonymous, '=begin testing SETUP: ->anonymous returns false' );
+is_deeply( [ $Setup->depends ], [], '=begin testing SETUP: ->depends returns null list' );
 is_deeply( [ $Setup->after ], [ $Setup->depends ], '->after matches ->depends' );
-is(   $Setup->content, "my \$Foo = Foo::Bar->new();\n", "=begin test setup: ->content returns expected" );
-ok( ! $Setup->tests, "=begin test setup: ->tests returns false" );
+is(   $Setup->content, "my \$Foo = Foo::Bar->new();\n", "=begin testing SETUP: ->content returns expected" );
+ok( ! $Setup->tests, "=begin testing SETUP: ->tests returns false" );
 
 my $Anonymous = Test::Inline::Section->new( shift @$elements );
 isa_ok( $Anonymous, 'Test::Inline::Section' );

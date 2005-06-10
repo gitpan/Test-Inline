@@ -9,7 +9,7 @@ use File::Slurp ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.01';
+	$VERSION = '2.00_09';
 }
 
 
@@ -24,6 +24,7 @@ my $header  = '';
 my $output  = '';
 my $execute = '';
 my $verbose = '';
+my $vcs     = '';
 
 my $rv = GetOptions(
 	"input=s"  => \$input,
@@ -31,6 +32,7 @@ my $rv = GetOptions(
 	"header=s" => \$header,
 	"execute"  => \$execute,
 	"verbose"  => \$verbose,
+	"vcs"      => \$vcs,
 	);
 exit(0) unless $rv;
 
@@ -79,6 +81,11 @@ if ( $header ) {
 }
 if ( $verbose ) {
 	$args{verbose} = 1;
+}
+if ( $vcs ) {
+	require Test::Inline::Handler::File::VCS;
+	$args{OutputHandler} = Test::Inline::Handler::File::VCS->new
+		or die "Failed to create VCS OutputHandler for current directory";
 }
 
 

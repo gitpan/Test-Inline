@@ -16,7 +16,7 @@ beginning with C<=begin test> or C<=begin testing>.
 There are two types of code sections. The first, beginning with 
 C<=begin testing ...>, contains a set of tests and other code to be executed
 at any time (within a set of specifyable constraints). The second, labelled
-C<=begin test setup>, contains code to be executed at the beginning of the
+C<=begin testing SETUP>, contains code to be executed at the beginning of the
 test script, before any of the other sections are executed. This allows
 any needed variables or environment to be set up before the tests are run.
 You can have more than one setup section, and they will be written to the
@@ -102,7 +102,7 @@ use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.00_08';
+	$VERSION = '2.00_09';
 	$errstr  = '';
 }
 
@@ -111,7 +111,7 @@ BEGIN {
 
 
 #####################################################################
-# Constructor
+# Constructor and Parsing
 
 =pod
 
@@ -123,8 +123,8 @@ The C<new> constructor takes a string of POD, which must be a single section
 of relevant pod ( preferably produced by L<Test::Inline::ExtractHandler> ),
 and creates a new section object for it.
 
-Returns a new Test::Inline::Section object if passed POD in the form
-C<=begin testing> or C<=being test setup>. Returns C<undef> on error.
+Returns a new C<Test::Inline::Section> object if passed POD in the form
+C<=begin testing ...>. Returns C<undef> on error.
 
 =cut
 
@@ -158,12 +158,9 @@ sub new {
 		pop @lines;
 	}
 
-	# Remove any leading and trailing empty lines
-	while ( @lines and $lines[0]  eq '' ) { shift @lines }
-	while ( @lines and $lines[-1] eq '' ) { pop @lines   }
-
-	# Check for nesting problems
-	$class->_nesting( \@lines, $begin ) or return undef;
+	# Do some cleaning up and checking
+	$class->_trim_empty_lines( \@lines );
+	$class->_check_nesting( \@lines, $begin ) or return undef;
 
 	# Create the basic object
 	my $self = bless {
@@ -189,15 +186,24 @@ sub new {
 		$self->{tests} = pop @parts;
 	}
 
+	# Handle setup sections via =begin test setup or =begin testing SETUP
+	my $setup = '';
+	if ( @parts == 2 and $parts[0] eq 'test' and $parts[1] eq 'setup' ) {
+		
+		$setup = 1;
+	}
+	if ( @parts == 2 and $parts[0] eq 'testing' and $parts[1] eq 'SETUP' ) {
+		$setup = 1;
+	}
+	if ( $setup ) {
+		$self->{setup} = 1;
+		return $self;
+	}
+
+	# Any other form of =begin test is not allowed
 	if ( $parts[0] eq 'test' ) {
-		# Handle the =begin test setup section
-		if ( $parts[1] eq 'setup' ) {
-			$self->{setup} = 1;
-			return $self;
-		} else {
-			# Unknown =begin test line
-			return $class->_error("Unknown '=begin test' line '$parts[1]'");
-		}
+		# Unknown =begin test line
+		return $class->_error("Unsupported '=begin test' line '$begin'");
 	}
 
 	# Remove the "testing" word
@@ -255,18 +261,15 @@ sub _example {
 		$begin .= ' ' if $begin;
 		$begin .= shift @lines;
 	}
-	
+
 	# Remove the trailing end tag
 	if ( @lines and $lines[-1] =~ /^=for\s+example\s+end\b/o ) {
 		pop @lines;
 	}
 
 	# Remove any leading and trailing empty lines
-	while ( @lines and $lines[0]  eq '' ) { shift @lines }
-	while ( @lines and $lines[-1] eq '' ) { pop @lines   }
-
-	# Check for nesting problems
-	$class->_nesting( \@lines, $begin ) or return undef;
+	$class->_trim_empty_lines( \@lines );
+	$class->_check_nesting( \@lines, $begin ) or return undef;
 
 	# Create the basic object
 	my $self = bless {
@@ -281,6 +284,7 @@ sub _example {
 		classes => {},       # Other classes this should be after
 		}, $class;
 
+	$self;
 }
 
 sub _error {
@@ -301,7 +305,7 @@ sub _short {
 	$string;
 }
 
-sub _nesting {
+sub _check_nesting {
 	my ($class, $lines, $begin) = @_;
 
 	# In the remaining lines there shouldn't be any lines
@@ -316,6 +320,13 @@ sub _nesting {
 			);
 	}
 
+	1;
+}
+
+sub _trim_empty_lines {
+	my $lines = $_[1];
+	while ( @$lines and $lines->[0]  eq '' ) { shift @$lines }
+	while ( @$lines and $lines->[-1] eq '' ) { pop @$lines   }
 	1;
 }
 

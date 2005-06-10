@@ -11,15 +11,15 @@ Test::Inline::Handler::File - Local Filesystem IO Handler
 L<Test::Inline> 2.00 was concieved in an enterprise setting, and retains
 the flexibilty, power, and bulk that this created.
 
-The intent with the FileHandler system is to allow Test::Inline to be
-able to pull source data from anywhere, and write the resulting test
+The intent with the C<FileHandler> system is to allow L<Test::Inline> to
+be able to pull source data from anywhere, and write the resulting test
 scripts to anywhere.
 
 Until a more powerful pure-OO file-system module comes along in the form
 of the L<FSI> project, this serves as a minimalist implementation of the
-functionality that Test::Inline needs in order to work.
+functionality that L<Test::Inline> needs in order to work.
 
-An alternative FileHandler class need not subclass this one, merely
+An alternative C<FileHandler> class need not subclass this one, merely
 implement the same interface, taking whatever alternative arguments to
 the C<new> constructor that it wishes.
 
@@ -38,7 +38,7 @@ use Class::Autouse 'File::Flat',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_08';
+	$VERSION = '2.00_09';
 }
 
 

@@ -13,6 +13,7 @@ inc/Module/Install/WriteAll.pm
 lib/Test/Inline.pm
 lib/Test/Inline/Handler/Extract.pm
 lib/Test/Inline/Handler/File.pm
+lib/Test/Inline/Handler/File/VCS.pm
 lib/Test/Inline/Script.pm
 lib/Test/Inline/Section.pm
 lib/Test/Inline/Util.pm

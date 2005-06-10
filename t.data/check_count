@@ -8,7 +8,7 @@ package Foo::Bar;
 
 Foo::Bar - Test Package
 
-=begin test setup 0
+=begin testing SETUP 0
 
 my $Foo = Foo::Bar->new();
 

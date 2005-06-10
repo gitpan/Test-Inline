@@ -60,7 +60,7 @@ is( $basic->{check_count}, 2, '->new( check_count => 2 ) initialises correctly' 
 # full count checking enabled.
 {
 	my $PODCONTENT = <<'END_TEST';
-# =begin test setup 0
+# =begin testing SETUP 0
 $::__tc = Test::Builder->current_test;
 my $Foo = Foo::Bar->new();
 is( Test::Builder->current_test, $::__tc,
@@ -137,7 +137,7 @@ $example  = File::Spec->catfile( 't.data', 'check_count' );
 # that doesn't all have test counts
 {
 	my $PODCONTENT = <<'END_TEST';
-# =begin test setup 0
+# =begin testing SETUP 0
 $::__tc = Test::Builder->current_test;
 my $Foo = Foo::Bar->new();
 is( Test::Builder->current_test, $::__tc,
@@ -201,7 +201,7 @@ END_TEST
 # And again, with the default test behaviour
 {
 	my $PODCONTENT = <<'END_TEST';
-# =begin test setup 0
+# =begin testing SETUP 0
 $::__tc = Test::Builder->current_test;
 my $Foo = Foo::Bar->new();
 is( Test::Builder->current_test, $::__tc,
@@ -265,7 +265,7 @@ END_TEST
 # And again, but with test count checking disabled
 {
 	my $PODCONTENT = <<'END_TEST';
-# =begin test setup 0
+# =begin testing SETUP 0
 my $Foo = Foo::Bar->new();
 
 
