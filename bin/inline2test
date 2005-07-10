@@ -1,91 +1,81 @@
 #!/usr/bin/perl
 
+=pod
+
+=head1 NAME
+
+inline2test - The Test::Inline 2 Test Compiler
+
+=head1 SYNOPIS
+
+  > inline2test ./inline2test.conf
+  
+  # In your inline2test.conf
+  input=lib
+  output=t
+  execute=0
+  verbose=1
+  header=inline2text.txt
+
+=head1 DESCRIPTION
+
+C<inline2test> is the L<Test::Inline> 2 test compiler.
+
+It's job is to scan through an arbitrary tree of Perl source code files,
+locate inline test sections, extract them, convert them to test scripts,
+and write them to an output path.
+
+=cut
+
 use strict;
 use warnings;
 use File::Spec::Functions ':ALL';
 use Getopt::Long;
+use Config::Tiny;
 use Test::Inline;
 use File::Slurp ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.00_09';
+	$VERSION = '2.099_01';
 }
+
+# Predeclare things
+sub stop ($);
 
 
 
 
 
 #####################################################################
-# Collect Options
+# Process Options, Input and Config
 
-my $input   = '';
-my $header  = '';
-my $output  = '';
 my $execute = '';
+my $changed = '';
 my $verbose = '';
-my $vcs     = '';
-
 my $rv = GetOptions(
-	"input=s"  => \$input,
-	"output=s" => \$output,
-	"header=s" => \$header,
-	"execute"  => \$execute,
-	"verbose"  => \$verbose,
-	"vcs"      => \$vcs,
+	execute => \$execute,
+	changed => \$changed,
+	verbose => \$verbose,
 	);
 exit(0) unless $rv;
 
+# Get the config file
+my $config = shift @ARGV
+	or stop("You did not provide a config file");
+my $Config = Config::Tiny->read($config)
+	or stop("Failed to load config file");
+my $args = $Config->{_}
+	or stop("No config entries found");
 
+# Add any forced options
+$args->{execute} = 1 if $execute;
+$args->{changed} = 1 if $changed;
+$args->{verbose} = 1 if $verbose;
 
-
-
-#####################################################################
-# Prepare Job
-
-# Create the Test::Inline object
-my %args = ();
-if ( $input ) {
-	unless ( -d $input ) {
-		print "The input directory '$input' does not exist\n";
-		exit(0);
-	}
-}
-if ( $output ) {
-	unless ( -d $output ) {
-		print "The output directory '$output' does not exist\n";
-		exit(0);
-	}
-	unless ( -w $output ) {
-		print "No write permissions to output directory '$output'\n";
-		exit(0);
-	}
-	$args{output} = $output;
-}
-if ( $header ) {
-	unless ( -f $header ) {
-		print "Template file '$header' does not exists\n";
-		exit(0);
-	}
-	unless ( -r $header ) {
-		print "No permissions to read Template file '$header'\n";
-		exit(0);
-	}
-	$header = File::Slurp::read_file( $header )
-		or die "Failed to read in the header file";
-	$args{file_content} = sub {
-		my $Object = shift;
-		my $Script = shift;
-		return $header . $Script->merged_content;
-		};
-}
-if ( $verbose ) {
-	$args{verbose} = 1;
-}
-if ( $vcs ) {
-	require Test::Inline::Handler::File::VCS;
-	$args{OutputHandler} = Test::Inline::Handler::File::VCS->new
-		or die "Failed to create VCS OutputHandler for current directory";
+# Check some stuff
+unless ( $args->{output} ) {
+	stop "No output path specified";
 }
 
 
@@ -95,19 +85,22 @@ if ( $vcs ) {
 #####################################################################
 # Generate the Test Scripts
 
-my $Inline = Test::Inline->new( %args )
-	or die "Failed to create Test::Inline object";
-if ( $input ) {
-	defined($Inline->add( $input ))
-		or die "Error during ->add call";
+my $Inline = Test::Inline->new( $args )
+	or stop "Error creating Test::Inline object";
+if ( $args->{input} ) {
+	unless ( defined $Inline->add( $args->{input} ) ) {
+		stop "Error during ->add('$args->{input}') call";
+	}
 } else {
-	defined($Inline->add_all)
-		or die "Error during ->add_all call";
+	unless ( defined $Inline->add_all ) {
+		stop "Error during ->add_all()";
+	}
 }
-defined($Inline->save)
-	or die "Error while saving scripts";
+unless ( defined $Inline->save ) {
+	stop "Error while saving scripts";
+}
 
-exit(0) unless $execute;
+exit(0) unless $args->{execute};
 
 
 
@@ -118,15 +111,27 @@ exit(0) unless $execute;
 
 my $schedule = $Inline->schedule;
 unless ( defined $schedule ) {
-	die "Error getting schedule";
+	stop "Error getting schedule to execute scripts";
 }
 unless ( $schedule ) {
-	print "Nothing to execute\n";
-	exit(0);
+	stop "Nothing to execute";
 }
 
 eval "use ExtUtils::Command::MM;";
 die $@ if $@;
 
-@ARGV = map { catfile($output, $_) } @$schedule;
+@ARGV = map { catfile($args->{output}, $_) } @$schedule;
 test_harness(0);
+
+
+
+
+
+
+#####################################################################
+# Support Functions
+
+sub stop ($) {
+	print "$_[0]\n";
+	exit(1);
+}

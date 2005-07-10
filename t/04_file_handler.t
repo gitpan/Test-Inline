@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Test as much of Test::Inline::Handler::File as we can without having
+# Test as much of Test::Inline::IO::File as we can without having
 # to actually write to disk. We might deal with the last ->write method
 # another time
 
@@ -33,11 +33,11 @@ my $inline3 = catfile('Test', 'Inline3.pm');
 
 
 #####################################################################
-# Test::Inline::Handler::File Tests
+# Test::Inline::IO::File Tests
 
 # Create a new FileHandler
-my $File = Test::Inline::Handler::File->new( $libdir );
-isa_ok( $File, 'Test::Inline::Handler::File' );
+my $File = Test::Inline::IO::File->new( $libdir );
+isa_ok( $File, 'Test::Inline::IO::File' );
 
 # The file for the main Test::Inline file MUST exist
 ok( $File->exists_file( $inline2 ), '->exists returns true for a file that exists' );
@@ -49,7 +49,7 @@ ok( ! $File->exists_file( $inline3 ), '->exists return false for a file that doe
 my $source = $File->read( $inline2 );
 ok( ref $source eq 'SCALAR', '->read returns a SCALAR reference' );
 ok( length $$source > 10000, '->read returns a string that is long enough' );
-ok( length $$source < 20000, '->read returns a string that is not TOO long' );
+ok( length $$source < 21000, '->read returns a string that is not TOO long' );
 
 # Read of a bad file returns undef
 is( $File->read( $inline3 ), undef, '->read of a bad file returns undef' );
@@ -60,17 +60,19 @@ is( $File->class_file( 'Test::Inline3' ), '', '->file with a bad class returns f
 
 # Check good and bad ->find calls
 is_deeply( $File->find( 'Test/Inline' ), [
-	catfile( 'Test', 'Inline', 'Handler', 'Extract.pm' ),
-	catfile( 'Test', 'Inline', 'Handler', 'File.pm'    ),
-	catfile( 'Test', 'Inline', 'Handler', 'File', 'VCS.pm' ),
-	catfile( 'Test', 'Inline', 'Script.pm'  ),
-	catfile( 'Test', 'Inline', 'Section.pm' ),
-	catfile( 'Test', 'Inline', 'Util.pm'    ),
+	catfile( 'Test', 'Inline', 'Content.pm'            ),
+	catfile( 'Test', 'Inline', 'Content', 'Default.pm' ),
+	catfile( 'Test', 'Inline', 'Content', 'Legacy.pm'  ),
+	catfile( 'Test', 'Inline', 'Extract.pm'            ),
+	catfile( 'Test', 'Inline', 'IO', 'File.pm'         ),
+	catfile( 'Test', 'Inline', 'IO', 'File', 'VCS.pm'  ),
+	catfile( 'Test', 'Inline', 'Script.pm'             ),
+	catfile( 'Test', 'Inline', 'Section.pm'            ),
+	catfile( 'Test', 'Inline', 'Util.pm'               ),
 	], '->find with path returns everything below it' );
-is_deeply( $File->find( 'Test/Inline/Handler' ), [
-	catfile( 'Test', 'Inline', 'Handler', 'Extract.pm' ),
-	catfile( 'Test', 'Inline', 'Handler', 'File.pm'    ),
-	catfile( 'Test', 'Inline', 'Handler', 'File', 'VCS.pm' ),
+is_deeply( $File->find( 'Test/Inline/IO' ), [
+	catfile( 'Test', 'Inline', 'IO', 'File.pm'    ),
+	catfile( 'Test', 'Inline', 'IO', 'File', 'VCS.pm' ),
 	], '->find with path returns everything below it' );
 is( $File->find( 'Test/Inline3' ), undef, '->find with a dir returns undef' );
 

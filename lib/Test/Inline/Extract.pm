@@ -1,30 +1,28 @@
-package Test::Inline::Handler::Extract;
+package Test::Inline::Extract;
 
 =pod
 
 =head1 NAME
 
-Test::Inline::Handler::Extract - Extract relevant Pod sections from source
+Test::Inline::Extract - Extract relevant Pod sections from source
 code.
 
 =head1 DESCRIPTION
 
-The Test::Inline::Handler::Extract package uses PPI to extract and merge all
-POD from a source file. It then seperates out the sections that are relevant
-to C<Test::Inline>.
+The Test::Inline::Extract package extracts content interesting to
+L<Test::Inline> from source files.
 
 =head1 METHODS
 
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use List::Util  ();
 use File::Slurp ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 }
 
 
@@ -42,7 +40,7 @@ The C<new> constructor creates a new Extract object. It is passed either a
 file name from which the source code would be loaded, or a reference to a
 string that directly contains source code.
 
-Returns a new C<Test::Inline::Handler::Extract> object or C<undef> on error.
+Returns a new C<Test::Inline::Extract> object or C<undef> on error.
 
 =cut
 
@@ -135,7 +133,7 @@ sub _elements {
 =head1 TO DO
 
 - For certain very complex cases, add a more intensive alternative parser
-based on PPI and/or POD::Parser
+based on PPI
 
 =head1 SUPPORT
 
@@ -143,7 +141,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 

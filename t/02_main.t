@@ -60,11 +60,11 @@ END_TEST
 
 
 #####################################################################
-# Test::Inline::Handler::Extract
+# Test::Inline::Extract
 
 # Create a new object
-my $Extract = Test::Inline::Handler::Extract->new( $example );
-isa_ok( $Extract, 'Test::Inline::Handler::Extract' );
+my $Extract = Test::Inline::Extract->new( $example );
+isa_ok( $Extract, 'Test::Inline::Extract' );
 
 # Try to get the sections
 my $elements = $Extract->elements;

@@ -28,7 +28,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 }
 
 # Special case, for when doing unit tests ONLY.
@@ -341,52 +341,6 @@ sub _wrap_content {
 	$code;
 }
 
-=pod
-
-=head2 file_content
-
-The C<file_content> method generates and returns the entire contents of the
-test file for the relavent source file.
-
-Returns a string containing the file contents on success, the "false" null
-string C<""> if there is no content, or C<undef> on error.
-
-=cut
-
-sub file_content {
-	my $self = shift;
-
-	# Get the merged content
-	my $content = $self->merged_content;
-	return undef unless defined $content;
-
-	# Determine a plan
-	my $tests = $self->tests;
-	my $plan  = defined $tests
-		? "tests => $tests"
-		: "'no_plan'";
-
-	# Wrap the merged contents with the rest of the test
-	# file infrastructure.
-	my $file = <<"END_TEST";
-#!/usr/bin/perl -w
-
-use strict;
-use Test::More $plan;
-\$| = 1;
-
-
-
-$content
-
-
-
-1;
-END_TEST
-
-	$file;
-}
-
 
 
 
@@ -455,7 +409,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 

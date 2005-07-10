@@ -15,18 +15,21 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 
 # Check their perl version
 ok( $] >= 5.005, "Your perl is new enough" );
 
 # Does the module load
 use Class::Autouse ':devel';
-use_ok('Test::Inline'                  );
-use_ok('Test::Inline::Util'            );
-use_ok('Test::Inline::Script'          );
-use_ok('Test::Inline::Section'         );
-use_ok('Test::Inline::Handler::File'   );
-use_ok('Test::Inline::Handler::Extract');
+use_ok('Test::Inline::Content'          );
+use_ok('Test::Inline::Content::Legacy'  );
+use_ok('Test::Inline::Content::Default' );
+use_ok('Test::Inline::Extract'          );
+use_ok('Test::Inline::IO::File'         );
+use_ok('Test::Inline'                   );
+use_ok('Test::Inline::Util'             );
+use_ok('Test::Inline::Script'           );
+use_ok('Test::Inline::Section'          );
 
 exit(0);

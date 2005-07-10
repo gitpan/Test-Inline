@@ -16,7 +16,7 @@ It's like XUnit, Perl-style.
 
 =head2 How does it work?
 
-Put simply, Test::Inline lets you write small fragments of general or
+C<Test::Inline> lets you write small fragments of general or
 method-specific testing code, and insert it anywhere you want in your
 modules, inside a specific tagged L<POD|perlpod> segment, like the
 following.
@@ -44,24 +44,24 @@ The key condition when writing them is that they should be conceptually
 independant of each other. Each chunk of testing code should not die
 or crash if it is run before or after another chunk.
 
-Using C<inline2test> or another test compiler, you can then transform
-these chunks in a test script, or an entire tree of modules into a complete
-set of standard L<Test::More>-based test scripts.
+Using L<inline2test> or another test compiler, you can then transform
+these chunks in a test script, or an entire tree of modules into a
+complete set of standard L<Test::More>-based test scripts.
 
 These test scripts can then be executed as normal.
 
 =head2 What is Test::Inline good for?
 
-Firstly, Test::Inline is incredibly useful for doing ad-hoc unit testing.
+C<Test::Inline> is incredibly useful for doing ad-hoc unit testing.
 
 In any large groups of modules, you can add testing code here, there and
 everywhere, anywhere you want. The next time the test compiler is run, a
-test script will just appear.
+new test script will just appear.
 
-It's also useful for systematically testing all self-contained code.
+It's also extremely for systematically testing self-contained code.
 
-That is, any code which can be independantly tested from external
-dependencies such as databases, and that has no side-effects on external
+That is, any code which can be independantly tested without the need for
+external systems such as databases, and that has no side-effects on external
 systems.
 
 All of this code, written by multiple people, can then have one single set
@@ -70,7 +70,7 @@ API, or anything you like, in fine detail.
 
 =head2 What is Test::Inline bad for?
 
-Test::Inline is not a complete testing solution, and there are several
+C<Test::Inline> is not a complete testing solution, and there are several
 types of testing you probably DON'T want to use it for.
 
 =over
@@ -91,7 +91,21 @@ Tests with side-effects such as those that might change a testing database
 
 =head2 Getting Started
 
-... to be completed
+Because Test::Inline creates test scripts that _don't_ start with a
+numeric order, is to create your normal tests using file names
+in the CPAN style of C<01_compile.t>, C<02_main.t>, C<03_foobar.t>.
+
+You can then add your testing fragments wherever you like throughout
+your code, and then use the C<inline2test> script to generate the test
+scripts for the inline tests. By default the test will be named after
+the packages that the test fragments are in.
+
+Tests for Class::Name will end up in the file C<class_name.t>.
+
+These test files sit quite happily alongside your number test scripts.
+
+When you run the test suite as you normally would, the inline scripts
+will be run after the numbered tests.
 
 =head1 METHODS
 
@@ -105,15 +119,18 @@ use Algorithm::Dependency ();
 use Test::Inline::Util    ();
 use Test::Inline::Section ();
 use Test::Inline::Script  ();
-use Class::Autouse 'Test::Inline::Handler::Extract';
-use Class::Autouse 'Test::Inline::Handler::File';
+use Test::Inline::Content ();
+use Test::Inline::Content::Legacy  ();
+use Test::Inline::Content::Default ();
+use Class::Autouse 'Test::Inline::Extract';
+use Class::Autouse 'Test::Inline::IO::File';
 
 # We need to act as a dependency source
 use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 }
 
 
@@ -194,8 +211,9 @@ sub new {
 	# Create the object
 	my $self = bless {
 		# Extensibility provided through the use of Handler classes
-		ExtractHandler => $params{ExtractHandler},
 		InputHandler   => $params{InputHandler},
+		ExtractHandler => $params{ExtractHandler},
+		ContentHandler => $params{ContentHandler},
 		OutputHandler  => $params{OutputHandler},
 
 		# Store the ::TestFile objects
@@ -217,22 +235,34 @@ sub new {
 			: 0 # No count checking
 		: 1; # Smart count checking (default)
 
-	# Use an alternative file content generator?
+	# Support the legacy file_content param
 	if ( $params{file_content} ) {
 		return undef unless ref $params{file_content} eq 'CODE';
-		$self->{file_content} = $params{file_content};
+		$self->{ContentHandler} = Test::Inline::Content::Legacy->new( $params{file_content} ) or return undef;
 	}
 
 	# Set the default Handlers
-	$self->{ExtractHandler} ||= 'Test::Inline::Handler::Extract';
-	$self->{InputHandler}   ||= Test::Inline::Handler::File->new( File::Spec->curdir );
-	$self->{OutputHandler}  ||= Test::Inline::Handler::File->new( File::Spec->curdir );
+	$self->{ExtractHandler} ||= 'Test::Inline::Extract';
+	$self->{ContentHandler} ||= Test::Inline::Content::Default->new;
+	$self->{InputHandler}   ||= Test::Inline::IO::File->new( File::Spec->curdir );
+	$self->{OutputHandler}  ||= Test::Inline::IO::File->new( File::Spec->curdir );
 
 	# Where to write test file to, within the context of the OutputHandler
 	$self->{output} = defined $params{output} ? $params{output} : '';
 
 	$self;
 }
+
+=pod
+
+=head2 InputHandler
+
+The C<InputHandler> method returns the file handler object that will be
+used to find and load the source code.
+
+=cut
+
+sub InputHandler { $_[0]->{InputHandler} }
 
 =pod
 
@@ -247,14 +277,13 @@ sub ExtractHandler { $_[0]->{ExtractHandler} }
 
 =pod
 
-=head2 InputHandler
+=head2 ContentHandler
 
-The C<InputHandler> method returns the file handler object that will be
-used to find and load the source code.
+The C<ContentHandler> accessor return the script content generation handler.
 
 =cut
 
-sub InputHandler { $_[0]->{InputHandler} }
+sub ContentHandler { $_[0]->{ContentHandler} }
 
 =pod
 
@@ -432,9 +461,9 @@ sub _add_source {
 
 =head2 classes
 
-The C<classes> method returns a list of the names of all the classes that have
-been added to the Inline object, or the null list C<()> if nothing has been
-added.
+The C<classes> method returns a list of the names of all the classes that
+have been added to the C<Test::Inline> object, or the null list C<()> if
+nothing has been added.
 
 =cut
 
@@ -448,8 +477,8 @@ sub classes {
 =head2 class
 
 For a given class name, fetches the L<Test::Inline::Script> object for that
-class, if it has been added to the C<Test::Inline> object. Returns C<undef> if the
-class has not been added to the C<Test::Inline> object.
+class, if it has been added to the C<Test::Inline> object. Returns C<undef>
+if the class has not been added to the C<Test::Inline> object.
 
 =cut
 
@@ -500,9 +529,9 @@ sub filenames {
 
 =head2 schedule
 
-While the C<filenames> method generates a map of the files for the various
-classes, the C<schedule> returns the list of file names in the order in which
-they should actually be executed.
+While the C<filenames> method generates a map of the files for the
+various classes, the C<schedule> returns the list of file names in the
+order in which they should actually be executed.
 
 Returns a reference to an array containing the file names as strings.
 
@@ -529,8 +558,8 @@ sub schedule {
 The C<manifest> generates the contents of the manifest file, if it is both
 wanted and needed.
 
-Returns the contents of the manifest file as a normal string, false if it is
-either not wanted or needed, or C<undef> on error.
+Returns the contents of the manifest file as a normal string, false if it
+is either not wanted or needed, or C<undef> on error.
 
 =cut
 
@@ -593,33 +622,27 @@ sub save {
 	# Write the files
 	my $written = 0;
 	foreach my $class ( sort keys %$filenames ) {
-		$self->_save_class( $class ) or return undef;
+		$self->_save( $class ) or return undef;
 		$written++;
 	}
 
 	$written;
 }
 
-sub _save_class {
+sub _file {
 	my $self      = shift;
-	my $class     = shift or return undef;
 	my $filenames = $self->filenames or return undef;
-	my $filename  = $filenames->{$class} or return undef;
+	$filenames->{$_[0]};
+}
+
+sub _save {
+	my $self     = shift;
+	my $class    = shift                    or return undef;
+	my $filename = $self->_file($class) or return undef;
 	local $| = 1;
 
-	# Get the file content
-	$self->_verbose("Generating $filename for $class...");
-	my $content = defined $self->{file_content}
-		# Use the custom file content generator
-		? &{$self->{file_content}}( $self, $self->{Classes}->{$class} )
-		# Use the default file content generator
-		: $self->{Classes}->{$class}->file_content;
-	unless ( defined $content ) {
-		$self->_verbose("Failed\n");
-		return undef;
-	}
-
 	# Write the file
+	my $content = $self->_content($class) or return undef;
 	$self->_verbose("Saving...");
 	if ( $self->{output} ) {
 		$filename = File::Spec->catfile( $self->{output}, $filename );
@@ -631,6 +654,20 @@ sub _save_class {
 	$self->_verbose("Done\n");
 
 	1;
+}
+
+sub _content {
+	my $self     = shift;
+	my $class    = shift                or return undef;
+	my $filename = $self->_file($class) or return undef;
+	my $Script   = $self->class($class) or return undef;
+
+	# Get the file content
+	$self->_verbose("Generating $filename for $class...");
+	my $content = $self->ContentHandler->process( $self, $Script );
+	$self->_verbose("Failed\n") unless defined $content;
+
+	$content; # content or undef
 }
 
 
@@ -715,13 +752,13 @@ Bugs should always be submitted via the CPAN bug tracker
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Inline>
 
 Professional support, assistance, or customisations for large scale
-uses of Test::Inline are available from L<http://phase-n.com/>.
+uses of C<Test::Inline> are available from L<http://phase-n.com/>.
 
 For other issues, contact the maintainer.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 ACKNOWLEDGEMENTS
 

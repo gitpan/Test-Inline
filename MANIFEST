@@ -11,9 +11,12 @@ inc/Module/Install/Scripts.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Test/Inline.pm
-lib/Test/Inline/Handler/Extract.pm
-lib/Test/Inline/Handler/File.pm
-lib/Test/Inline/Handler/File/VCS.pm
+lib/Test/Inline/Content.pm
+lib/Test/Inline/Content/Default.pm
+lib/Test/Inline/Content/Legacy.pm
+lib/Test/Inline/Extract.pm
+lib/Test/Inline/IO/File.pm
+lib/Test/Inline/IO/File/VCS.pm
 lib/Test/Inline/Script.pm
 lib/Test/Inline/Section.pm
 lib/Test/Inline/Util.pm
@@ -44,4 +47,5 @@ t/08_add_all.t
 t/09_regression.t
 t/10_legacy_extract.t
 t/11_legacy_script.t
+t/12_content_handler.t
 t/99_pod.t

@@ -44,7 +44,7 @@ use Test::Inline ();
 	isa_ok( $Script, 'Test::Inline::Script' );
 	is( $Script->class, 'My::Pirate', '->class returns as expected' );
 	is( $Script->filename, 'my_pirate.t', '->filename gets set as expected' );
-	is( $Script->file_content, <<'END_SCRIPT', '->file_content gets set as expected' );
+	is( $Inline->_content('My::Pirate'), <<'END_SCRIPT', '->_content gets set as expected' );
 #!/usr/bin/perl -w
 
 use strict;

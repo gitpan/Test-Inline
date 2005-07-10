@@ -20,7 +20,7 @@ BEGIN {
 use Test::Inline;
 
 # Execute the API test
-use Test::More 'tests' => 75;
+use Test::More 'tests' => 93;
 use Test::ClassAPI;
 Test::ClassAPI->execute('complete', 'collisions');
 
@@ -34,9 +34,10 @@ Algorithm::Dependency::Item=interface
 [Test::Inline]
 Algorithm::Dependency::Source=isa
 new=method
-ExtractHandler=method
 InputHandler=method
+ExtractHandler=method
 OutputHandler=method
+ContentHandler=method
 add=method
 add_class=method
 add_all=method
@@ -74,13 +75,12 @@ sections=method
 sorted=method
 merged_content=method
 tests=method
-file_content=method
 
-[Test::Inline::Handler::Extract]
+[Test::Inline::Extract]
 new=method
 elements=method
 
-[Test::Inline::Handler::File]
+[Test::Inline::IO::File]
 new=method
 exists_file=method
 exists_dir=method
@@ -88,6 +88,17 @@ read=method
 write=method
 class_file=method
 find=method
+
+[Test::Inline::Content]
+new=method
+process=method
+
+[Test::Inline::Content::Legacy]
+Test::Inline::Content=isa
+coderef=method
+
+[Test::Inline::Content::Default]
+Test::Inline::Content=isa
 
 [Algorithm::Dependency::Source]
 load=method

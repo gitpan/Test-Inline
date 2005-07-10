@@ -1,5 +1,17 @@
 Revision history for Perl extension Test::Inline
 
+2.099_01 Sun Jul 10 2005
+	- Starting to implement the 2.100 roadmap
+	- Moved Test::Inline::Handler::Extract   to Test::Inline::Extract
+	- Moved Test::Inline::Handler::File      to Test::Inline::IO::File
+	- Moved Test::Inline::Handler::File::VCS to Test::Inline::IO::File::VCS
+	- Convert inline2test to use a config file
+	- Added Test::Inline::Content
+	- Added Test::Inline::Content::Legacy
+	- Added Test::Inline::Content::Default
+	- Reorganised code to make it all work again
+	- Added 12_content.t
+
 2.002   Sat Jun 11 2005
 	- The Test::Builder interface changes, breaking the test counts.
 	- This change makes them work again

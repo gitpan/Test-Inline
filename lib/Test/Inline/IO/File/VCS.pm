@@ -1,15 +1,21 @@
-package Test::Inline::Handler::File::VCS;
+package Test::Inline::IO::File::VCS;
 
 =pod
 
 =head1 NAME
 
-Test::Inline::Handler::File - Test::Inline IO Handler for Version Control Systems
+Test::Inline::IO::File::VCS - Test::Inline IO Handler for Version Control Systems
 
 =head1 DESCRIPTION
 
-This class implements a Test::Inline 2 IO Handler for outputing test files
-into trees of directories checkout out from a version control system.
+This class implements a L<Test::Inline> 2 IO Handler for outputing test
+files into trees of directories checkout out from a version control system.
+
+This class is intended for release with Test::Inline 2.100, and if you are
+seeing this it probably got accidentally rolled up by the author's automated
+release dist builder script.
+
+Please ignore this class for the time being.
 
 =head1 METHODS
 
@@ -17,11 +23,11 @@ into trees of directories checkout out from a version control system.
 
 use strict;
 use File::Spec ();
-use base 'Test::Inline::Handler::File';
+use base 'Test::Inline::IO::File';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 }
 
 
@@ -47,7 +53,7 @@ system in use, and should act accordindly.
 
 Initially, this class support CVS and Subversion.
 
-Returns a new C<Test::Inline::Handler::File::VCS>, or C<undef> if it
+Returns a new C<Test::Inline::IO::File::VCS>, or C<undef> if it
 cannot determine the VCS type.
 
 =cut
@@ -91,7 +97,7 @@ sub VCS { $self->{type} }
 
 =head2 write $file, $content
 
-The C<write> method works as for the parent L<Test::Inline::Handler::File>
+The C<write> method works as for the parent L<Test::Inline::IO::File>
 class, except that if the file does not yet exist, it will be additionally
 added to the version control system.
 
@@ -144,7 +150,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 

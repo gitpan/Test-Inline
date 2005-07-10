@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Check Test::Inline::Handler::Extract support for older test styles
+# Check Test::Inline::Extract support for older test styles
 
 use strict;
 use lib ();
@@ -18,7 +18,7 @@ BEGIN {
 use Class::Autouse ':devel';
 use File::Slurp ();
 use Test::More tests => 7;
-use Test::Inline::Handler::Extract ();
+use Test::Inline::Extract ();
 
 
 
@@ -33,8 +33,8 @@ use Test::Inline::Handler::Extract ();
 		) or die "Failed to load Inline.pm test file";
 	is( ref($inline_file), 'SCALAR', 'Loaded Inline.pm examples' );
 
-	my $Extract = Test::Inline::Handler::Extract->new( $inline_file );
-	isa_ok( $Extract, 'Test::Inline::Handler::Extract' );
+	my $Extract = Test::Inline::Extract->new( $inline_file );
+	isa_ok( $Extract, 'Test::Inline::Extract' );
 
 	my $elements = $Extract->elements;
 	is( ref($elements), 'ARRAY', '->elements returns an ARRAY ref' );

@@ -12,6 +12,7 @@ requires       ( 'File::Find::Rule'      => '0.26'    );
 requires       ( 'Algorithm::Dependency' => '1.02'    );
 requires       ( 'Class::Autouse'        => '1.15'    );
 requires       ( 'File::Flat'            => '0.95'    );
+requires       ( 'Config::Tiny'          => '2.00'    );
 requires       ( 'Getopt::Long'          => '2.34'    );
 build_requires ( 'Test::More'            => '0.47'    );
 build_requires ( 'Test::ClassAPI'        => '1.02'    );

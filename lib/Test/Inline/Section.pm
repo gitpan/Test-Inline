@@ -102,7 +102,7 @@ use List::Util ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 	$errstr  = '';
 }
 
@@ -549,7 +549,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 

@@ -1,14 +1,14 @@
-package Test::Inline::Handler::File;
+package Test::Inline::IO::File;
 
 =pod
 
 =head1 NAME
 
-Test::Inline::Handler::File - Local Filesystem IO Handler
+Test::Inline::IO::File - Local Filesystem IO Handler
 
 =head1 DESCRIPTION
 
-L<Test::Inline> 2.00 was concieved in an enterprise setting, and retains
+L<Test::Inline> 2.00 was conceived in an enterprise setting, and retains
 the flexibilty, power, and bulk that this created.
 
 The intent with the C<FileHandler> system is to allow L<Test::Inline> to
@@ -38,7 +38,7 @@ use Class::Autouse 'File::Flat',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.002';
+	$VERSION = '2.099_01';
 }
 
 
@@ -53,7 +53,7 @@ BEGIN {
 =head2 new $path
 
 The C<new> constructor takes a root path on the local filesystem
-and returns a new C<Test::Inline::Handler::File> object to that
+and returns a new C<Test::Inline::IO::File> object to that
 location.
 
 =cut
@@ -209,7 +209,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
