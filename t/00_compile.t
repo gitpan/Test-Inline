@@ -15,7 +15,7 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # Check their perl version
 ok( $] >= 5.005, "Your perl is new enough" );
@@ -25,6 +25,7 @@ use Class::Autouse ':devel';
 use_ok('Test::Inline::Content'          );
 use_ok('Test::Inline::Content::Legacy'  );
 use_ok('Test::Inline::Content::Default' );
+use_ok('Test::Inline::Content::Simple'  );
 use_ok('Test::Inline::Extract'          );
 use_ok('Test::Inline::IO::File'         );
 use_ok('Test::Inline'                   );

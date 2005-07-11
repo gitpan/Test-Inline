@@ -34,10 +34,11 @@ use Getopt::Long;
 use Config::Tiny;
 use Test::Inline;
 use File::Slurp ();
+use Test::Inline::IO::File ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.099_01';
+	$VERSION = '2.099_02';
 }
 
 # Predeclare things
@@ -61,20 +62,59 @@ my $rv = GetOptions(
 exit(0) unless $rv;
 
 # Get the config file
-my $config = shift @ARGV
-	or stop("You did not provide a config file");
-my $Config = Config::Tiny->read($config)
-	or stop("Failed to load config file");
-my $args = $Config->{_}
-	or stop("No config entries found");
+my $config    = shift @ARGV;
+my $configdir = 1;
+unless ( $config ) {
+	# Use a default inline2test.conf in the current directory if it exists
+	my $default = catfile( curdir(), 'inline2test.conf' );
+	if ( -f $default ) {
+		$config = curdir();
+	} else {
+		stop("You did not provide an config file name");
+	}
+}
+if ( -d $config ) {
+	# They point to a directory, not a file
+	$configdir = $config;
+	my $file = catfile( $config, 'inline2test.conf' );
+	if ( -f $file ) {
+		$config = $file;
+	} else {
+		stop("The directory $config does not contain an inline2test.conf file");
+	}
+}
+my $Config = Config::Tiny->read($config) or stop("Failed to load config file");
+my %args = %{$Config->{_}}               or stop("No config entries found");
 
 # Add any forced options
-$args->{execute} = 1 if $execute;
-$args->{changed} = 1 if $changed;
-$args->{verbose} = 1 if $verbose;
+$args{execute} = 1 if $execute;
+$args{changed} = 1 if $changed;
+$args{verbose} = 1 if $verbose;
 
-# Check some stuff
-unless ( $args->{output} ) {
+# Automatically use an inline2test.tpl file if it exists
+if ( $configdir and ! $args{template} ) {
+	my $file = catfile( $configdir, 'inline2test.tpl' );
+	$args{template} = $file if -f $file;
+}
+
+# Create ContentHandler if needed
+if ( $args{template} ) {
+	# Convert to a proper contenthandler
+	my $template = delete $args{template};
+	$args{ContentHandler} = Test::Inline::Content::Simple->new( $template )
+		or stop("Failed to create ContentHandler for $template");
+}
+
+# Create InputHandler
+if ( $args{input} ) {
+	# Convert to a proper inputhandler
+	my $input = delete $args{input};
+	$args{InputHandler} = Test::Inline::IO::File->new( $input )
+		or stop("Failed to create InputHandle for $input");
+}
+
+# We need an output
+unless ( $args{output} ) {
 	stop "No output path specified";
 }
 
@@ -85,22 +125,12 @@ unless ( $args->{output} ) {
 #####################################################################
 # Generate the Test Scripts
 
-my $Inline = Test::Inline->new( $args )
+my $Inline = Test::Inline->new( %args )
 	or stop "Error creating Test::Inline object";
-if ( $args->{input} ) {
-	unless ( defined $Inline->add( $args->{input} ) ) {
-		stop "Error during ->add('$args->{input}') call";
-	}
-} else {
-	unless ( defined $Inline->add_all ) {
-		stop "Error during ->add_all()";
-	}
-}
-unless ( defined $Inline->save ) {
-	stop "Error while saving scripts";
-}
+defined $Inline->add_all or stop "Error during ->add_all()";
+defined $Inline->save    or stop "Error while saving scripts";
 
-exit(0) unless $args->{execute};
+exit(0) unless $args{execute};
 
 
 
@@ -120,9 +150,8 @@ unless ( $schedule ) {
 eval "use ExtUtils::Command::MM;";
 die $@ if $@;
 
-@ARGV = map { catfile($args->{output}, $_) } @$schedule;
+@ARGV = map { catfile($args{output}, $_) } @$schedule;
 test_harness(0);
-
 
 
 

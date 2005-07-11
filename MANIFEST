@@ -14,6 +14,7 @@ lib/Test/Inline.pm
 lib/Test/Inline/Content.pm
 lib/Test/Inline/Content/Default.pm
 lib/Test/Inline/Content/Legacy.pm
+lib/Test/Inline/Content/Simple.pm
 lib/Test/Inline/Extract.pm
 lib/Test/Inline/IO/File.pm
 lib/Test/Inline/IO/File/VCS.pm
@@ -32,6 +33,7 @@ t.data/06_multifile/lib/Test/Two.pm
 t.data/06_multifile/t/README
 t.data/09_regression/My/BadPodNesting.pm
 t.data/10_legacy_extract/Inline.pm
+t.data/12_content_handler/test.tpl
 t.data/bad_dependency
 t.data/check_count
 t.data/example

@@ -122,6 +122,7 @@ use Test::Inline::Script  ();
 use Test::Inline::Content ();
 use Test::Inline::Content::Legacy  ();
 use Test::Inline::Content::Default ();
+use Test::Inline::Content::Simple  ();
 use Class::Autouse 'Test::Inline::Extract';
 use Class::Autouse 'Test::Inline::IO::File';
 
@@ -130,7 +131,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.099_01';
+	$VERSION = '2.099_02';
 }
 
 

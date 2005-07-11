@@ -63,6 +63,7 @@ is_deeply( $File->find( 'Test/Inline' ), [
 	catfile( 'Test', 'Inline', 'Content.pm'            ),
 	catfile( 'Test', 'Inline', 'Content', 'Default.pm' ),
 	catfile( 'Test', 'Inline', 'Content', 'Legacy.pm'  ),
+	catfile( 'Test', 'Inline', 'Content', 'Simple.pm'  ),
 	catfile( 'Test', 'Inline', 'Extract.pm'            ),
 	catfile( 'Test', 'Inline', 'IO', 'File.pm'         ),
 	catfile( 'Test', 'Inline', 'IO', 'File', 'VCS.pm'  ),

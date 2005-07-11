@@ -20,7 +20,7 @@ BEGIN {
 use Test::Inline;
 
 # Execute the API test
-use Test::More 'tests' => 93;
+use Test::More 'tests' => 100;
 use Test::ClassAPI;
 Test::ClassAPI->execute('complete', 'collisions');
 
@@ -99,6 +99,10 @@ coderef=method
 
 [Test::Inline::Content::Default]
 Test::Inline::Content=isa
+
+[Test::Inline::Content::Simple]
+Test::Inline::Content=isa
+template=method
 
 [Algorithm::Dependency::Source]
 load=method

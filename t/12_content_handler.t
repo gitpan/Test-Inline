@@ -15,7 +15,7 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 21;
+use Test::More tests => 26;
 use Test::Inline ();
 
 
@@ -31,7 +31,7 @@ isa_ok( $Content, 'Test::Inline::Content' );
 # We'll need an Inline object
 my $Inline = Test::Inline->new;
 isa_ok( $Inline, 'Test::Inline' );
-my $example = File::Spec->catfile( 't.data', 'example' );
+my $example = catfile( 't.data', 'example' );
 ok( $Inline->add( $example ), 'Adding example file' );
 
 # Check the ::Script object created by the addition
@@ -84,3 +84,57 @@ isa_ok( $Default, 'Test::Inline::Content::Default' );
 $rv = $Default->process( $Inline, $Script );
 ok( (defined $rv and ! ref $rv and length $rv), '->process(good) returns a string' );
 
+
+
+
+
+#####################################################################
+# Test::Inline::Content::Simple Tests
+
+my $file   = catfile( 't.data', '12_content_handler', 'test.tpl' );
+ok( -f $file, 'Test file exists' );
+my $Simple = Test::Inline::Content::Simple->new( $file );
+isa_ok( $Simple, 'Test::Inline::Content::Simple' );
+is( $Simple->template, <<'END_TEMPLATE', 'Template content matches expected' );
+[% plan %]
+
+[% tests %]
+END_TEMPLATE
+
+$rv = $Simple->process( $Inline, $Script );
+ok( (defined $rv and ! ref $rv and length $rv), '->process(good) returns a string' );
+is( $rv, <<'END_CODE', '->process inserts the code as expected' );
+tests => 10
+
+# =begin testing SETUP 0
+my $Foo = Foo::Bar->new();
+
+
+
+# =begin testing bar 2
+{
+This is also a test
+}
+
+
+
+# =begin testing that after bar 4
+{
+Final test
+}
+
+
+
+# =begin testing foo after bar that 3
+{
+This is another test
+}
+
+
+
+# =begin testing 1
+{
+This is a test
+}
+
+END_CODE

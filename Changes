@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Inline
 
+2.099_01 Tue Jul 12 2005
+	- More work on making inline2test just DWYM
+	- Added Test::Inline::Content::Simple
+
 2.099_01 Sun Jul 10 2005
 	- Starting to implement the 2.100 roadmap
 	- Moved Test::Inline::Handler::Extract   to Test::Inline::Extract
