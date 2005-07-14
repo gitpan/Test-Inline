@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Inline
 
+2.100    Thu Jul 14 2005
+	- Worked as good as I hoped, moving to production release
+	- Bundling a couple of build-time-only deps
+
 2.099_01 Tue Jul 12 2005
 	- More work on making inline2test just DWYM
 	- Added Test::Inline::Content::Simple

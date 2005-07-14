@@ -16,6 +16,9 @@ requires       ( 'Config::Tiny'          => '2.00'    );
 requires       ( 'Getopt::Long'          => '2.34'    );
 build_requires ( 'Test::More'            => '0.47'    );
 build_requires ( 'Test::ClassAPI'        => '1.02'    );
+include        ( 'ExtUtils::AutoInstall'              );
+include        ( 'Test::ClassAPI'                     );
+include        ( 'Class::Inspector'                   );
 install_script ( 'bin/inline2test'                    );
 no_index       ( directory               => 't.data'  );
 
