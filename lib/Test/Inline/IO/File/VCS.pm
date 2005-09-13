@@ -11,9 +11,9 @@ Test::Inline::IO::File::VCS - Test::Inline IO Handler for Version Control System
 This class implements a L<Test::Inline> 2 IO Handler for outputing test
 files into trees of directories checkout out from a version control system.
 
-This class is intended for release with Test::Inline 2.100, and if you are
-seeing this it probably got accidentally rolled up by the author's automated
-release dist builder script.
+This class is intended for release with a future L<Test::Inline> release,
+and if you are seeing this it probably got accidentally rolled up by the
+author's automated release dist builder script.
 
 Please ignore this class for the time being.
 
@@ -27,7 +27,7 @@ use base 'Test::Inline::IO::File';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 

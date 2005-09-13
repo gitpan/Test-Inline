@@ -17,12 +17,13 @@ L<Test::Inline> from source files.
 =cut
 
 use strict;
-use List::Util  ();
-use File::Slurp ();
+use List::Util   ();
+use File::Slurp  ();
+use Params::Util qw{_CLASS _INSTANCE _SCALAR};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 
@@ -45,7 +46,7 @@ Returns a new C<Test::Inline::Extract> object or C<undef> on error.
 =cut
 
 sub new {
-	my $class  = ref $_[0] ? die '->new is a static method' : shift;
+	my $class  = _CLASS(shift) or die '->new is a static method';
 
 	# Get the source code to process, and clean it up
 	my $source = $class->_source(shift) or return undef;
@@ -64,8 +65,8 @@ sub new {
 sub _source {
 	my $self = shift;
 	return undef unless defined $_[0];
-	return shift if ref $_[0] eq 'SCALAR';
-	return undef if ref $_[0];
+	return shift if     _SCALAR($_[0]);
+	return undef if     ref $_[0];
 	File::Slurp::read_file( shift, scalar_ref => 1 );
 }
 
@@ -118,7 +119,7 @@ sub elements {
 }
 
 sub _elements {
-	my $self = shift;
+	my $self     = shift;
 	my @elements = ();
 	while ( $self->{source} =~ m/$search/go ) {
 		push @elements, $1;

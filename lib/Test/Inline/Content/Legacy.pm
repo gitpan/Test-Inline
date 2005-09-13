@@ -51,12 +51,12 @@ The synopsis above pretty much says all you need to know.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use base 'Test::Inline::Content';
+use Params::Util qw{_CODE _INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 =pod
@@ -75,7 +75,7 @@ passed a C<CODE> reference.
 sub new {
 	my $class = ref $_[0] ? ref shift : shift;
 	my $self  = $class->SUPER::new(@_);
-	$self->{coderef} = ref $_[0] eq 'CODE' ? shift : return undef;
+	$self->{coderef} = _CODE(shift) or return undef;
 	$self;
 }
 
@@ -101,8 +101,8 @@ to the legacy function, and returning it's result as the return value.
 
 sub process {
 	my $self   = shift;
-	my $Inline = isa(ref $_[0], 'Test::Inline')         ? shift : return undef;
-	my $Script = isa(ref $_[0], 'Test::Inline::Script') ? shift : return undef;
+	my $Inline = _INSTANCE(shift, 'Test::Inline')         or return undef;
+	my $Script = _INSTANCE(shift, 'Test::Inline::Script') or return undef;
 
 	# Pass through the params, pass back the result
 	$self->coderef->( $Inline, $Script );	

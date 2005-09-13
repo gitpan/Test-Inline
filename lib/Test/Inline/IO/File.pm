@@ -32,13 +32,12 @@ underlying filesystem if required.
 
 use strict;
 use File::Spec ();
-use UNIVERSAL 'isa';
 use Class::Autouse 'File::Flat',
                    'File::Find::Rule';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 

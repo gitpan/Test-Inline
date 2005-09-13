@@ -12,7 +12,7 @@ Embedding tests allows tests to be placed near the code it's testing.
 
 This is a nice supplement to the traditional .t files.
 
-It's like XUnit, Perl-style.
+It's like XUnit, only better and Perl-style.
 
 =head2 How does it work?
 
@@ -28,7 +28,7 @@ following.
   ok( -f /proc/cpuinfo, 'Host has a standard /proc/cpuinfo file' );
   
   =end testing
-
+  
   # Completely test a single method
   
   =begin testing label
@@ -112,9 +112,9 @@ will be run after the numbered tests.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use File::Spec            ();
 use IO::Handle            ();
+use Params::Util          qw{_CLASS _INSTANCE _SCALAR _CODE};
 use Algorithm::Dependency ();
 use Test::Inline::Util    ();
 use Test::Inline::Section ();
@@ -131,7 +131,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 
@@ -206,7 +206,7 @@ Returns C<undef> if there is a problem with one of the options.
 
 # For now, the various Handlers are hard-coded
 sub new {
-	my $class  = ref $_[0] ? die '->new is a static method' : shift;
+	my $class  = _CLASS(shift) or die '->new is a static method';
 	my %params = @_;
 
 	# Create the object
@@ -238,7 +238,7 @@ sub new {
 
 	# Support the legacy file_content param
 	if ( $params{file_content} ) {
-		return undef unless ref $params{file_content} eq 'CODE';
+		_CODE($params{file_content}) or return undef;
 		$self->{ContentHandler} = Test::Inline::Content::Legacy->new( $params{file_content} ) or return undef;
 	}
 
@@ -416,7 +416,7 @@ sub _add_directory {
 # Actually add the source code
 sub _add_source {
 	my $self   = shift;
-	my $source = ref $_[0] eq 'SCALAR' ? shift : return undef;
+	my $source = _SCALAR(shift) or return undef;
 
 	# Extract the elements from the source code
 	my $Extract = $self->ExtractHandler->new( $source )
@@ -638,7 +638,7 @@ sub _file {
 
 sub _save {
 	my $self     = shift;
-	my $class    = shift                    or return undef;
+	my $class    = shift                or return undef;
 	my $filename = $self->_file($class) or return undef;
 	local $| = 1;
 
@@ -706,11 +706,11 @@ sub _source {
 		}
 		return undef;
 	}
-	if ( ref $_[0] eq 'SCALAR' ) {
+	if ( _SCALAR($_[0]) ) {
 		# Reference to SCALAR containing code
 		return shift;
 	}
-	if ( isa(ref $_[0], 'IO::Handle') ) {
+	if ( _INSTANCE($_[0], 'IO::Handle') ) {
 		my $fh   = shift;
 		my $old  = $fh->input_record_separator(undef);
 		my $code = $fh->getline;
@@ -739,6 +739,12 @@ sub _error {
 1;
 
 =pod
+
+=head1 BUGS
+
+The "Extended =begin" syntax used for non-trivial sections is not really
+considered part of the spec yet. While simple '=begin testing' sections are
+find and will pass POD testing, extended begin sections may cause POD errors.
 
 =head1 TO DO
 

@@ -63,7 +63,7 @@ is( $basic->{check_count}, 2, '->new( check_count => 2 ) initialises correctly' 
 # =begin testing SETUP 0
 $::__tc = Test::Builder->new->current_test;
 my $Foo = Foo::Bar->new();
-is( Test::Builder->new->current_test, $::__tc,
+is( Test::Builder->new->current_test - $::__tc, 0,
 	'0 tests were run in the section' );
 
 
@@ -73,7 +73,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is also a test
 }
-is( Test::Builder->new->current_test, $::__tc + 2,
+is( Test::Builder->new->current_test - $::__tc, 2,
 	'2 tests were run in the section' );
 
 
@@ -83,7 +83,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 Final test
 }
-is( Test::Builder->new->current_test, $::__tc + 4,
+is( Test::Builder->new->current_test - $::__tc, 4,
 	'4 tests were run in the section' );
 
 
@@ -93,7 +93,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is another test
 }
-is( Test::Builder->new->current_test, $::__tc + 3,
+is( Test::Builder->new->current_test - $::__tc, 3,
 	'3 tests were run in the section' );
 
 
@@ -103,7 +103,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is a test
 }
-is( Test::Builder->new->current_test, $::__tc + 1,
+is( Test::Builder->new->current_test - $::__tc, 1,
 	'1 test was run in the section' );
 END_TEST
 
@@ -140,7 +140,7 @@ $example  = File::Spec->catfile( 't.data', 'check_count' );
 # =begin testing SETUP 0
 $::__tc = Test::Builder->new->current_test;
 my $Foo = Foo::Bar->new();
-is( Test::Builder->new->current_test, $::__tc,
+is( Test::Builder->new->current_test - $::__tc, 0,
 	'0 tests were run in the section' );
 
 
@@ -164,7 +164,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is another test
 }
-is( Test::Builder->new->current_test, $::__tc + 3,
+is( Test::Builder->new->current_test - $::__tc, 3,
 	'3 tests were run in the section' );
 
 
@@ -174,7 +174,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is a test
 }
-is( Test::Builder->new->current_test, $::__tc + 1,
+is( Test::Builder->new->current_test - $::__tc, 1,
 	'1 test was run in the section' );
 END_TEST
 
@@ -204,7 +204,7 @@ END_TEST
 # =begin testing SETUP 0
 $::__tc = Test::Builder->new->current_test;
 my $Foo = Foo::Bar->new();
-is( Test::Builder->new->current_test, $::__tc,
+is( Test::Builder->new->current_test - $::__tc, 0,
 	'0 tests were run in the section' );
 
 
@@ -228,7 +228,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is another test
 }
-is( Test::Builder->new->current_test, $::__tc + 3,
+is( Test::Builder->new->current_test - $::__tc, 3,
 	'3 tests were run in the section' );
 
 
@@ -238,7 +238,7 @@ $::__tc = Test::Builder->new->current_test;
 {
 This is a test
 }
-is( Test::Builder->new->current_test, $::__tc + 1,
+is( Test::Builder->new->current_test - $::__tc, 1,
 	'1 test was run in the section' );
 END_TEST
 

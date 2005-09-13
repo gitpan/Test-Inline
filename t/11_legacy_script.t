@@ -73,7 +73,7 @@ eval q{
 };
 is($@, '', 'Example 1 compiles cleanly');
 }
-is( Test::Builder->new->current_test, $::__tc + 1,
+is( Test::Builder->new->current_test - $::__tc, 1,
 	'1 test was run in the section' );
 
 

@@ -18,8 +18,8 @@ and then merge them into a test file.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
-use List::Util ();
+use List::Util   ();
+use Params::Util qw{_ARRAY _INSTANCE};
 use Algorithm::Dependency::Ordered;
 use base 'Algorithm::Dependency::Source',
          'Algorithm::Dependency::Item';
@@ -28,7 +28,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 # Special case, for when doing unit tests ONLY.
@@ -61,8 +61,8 @@ Returns C<undef> on error.
 
 sub new {
 	my $class       = shift;
-	my $_class      = defined $_[0]        ? shift : return undef;
-	my $Sections    = ref $_[0] eq 'ARRAY' ? shift : return undef;
+	my $_class      = defined $_[0] ? shift : return undef;
+	my $Sections    = _ARRAY(shift) or return undef;
 	my $check_count = shift || 0;
 
 	# Create the object
@@ -297,7 +297,7 @@ sub merged_content {
 # in the standard boilerplate.
 sub _wrap_content {
 	my $self    = shift;
-	my $Section = isa($_[0], 'Test::Inline::Section') ? shift : return undef;
+	my $Section = _INSTANCE(shift, 'Test::Inline::Section') or return undef;
 	my $code    = $Section->content;
 
 	# Wrap in compilation test code if an example
@@ -327,8 +327,8 @@ sub _wrap_content {
 		my $section  = 
 		$code = "\$::__tc = Test::Builder->new->current_test;\n"
 		      . $code
-		      . "is( Test::Builder->new->current_test, \$::__tc"
-		        . ($increase ? " + $increase" : '')
+		      . "is( Test::Builder->new->current_test - \$::__tc, "
+		        . ($increase || '0')
 		        . ",\n"
 		      . "\t'$increase $were run in the section' );\n";
 	}
@@ -378,7 +378,9 @@ sub id {
 
 sub depends {
 	my $self = shift;
-	my %depends = map { $_ => 1 } map { $_->classes } ($self->setup, $self->sections);
+	my %depends = map { $_ => 1     }
+	              map { $_->classes }
+	              ($self->setup, $self->sections);
 	keys %depends;	
 }
 

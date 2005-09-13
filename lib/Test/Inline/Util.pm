@@ -1,5 +1,5 @@
 # This is an inlined version of the private Phase N module File::DirUtils,
-# approved for use only in it's inline state as Test::Inline::Util.
+# approved for use only in its inline state as Test::Inline::Util.
 # It will be released to CPAN at some later time, once complete.
 # We ask that until that time you respect our development process and
 # do not use this code.
@@ -8,7 +8,7 @@ use strict;
 use File::Spec::Functions ':ALL';
 use vars qw{$VERSION};
 BEGIN {
-$VERSION = '2.100';
+$VERSION = '2.101';
 }
 sub shorten {
 my $class = ref $_[0] ? ref shift : shift;

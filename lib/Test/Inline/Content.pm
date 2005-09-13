@@ -19,7 +19,7 @@ extensions can be written to control the content of the generated scripts.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
+use Params::Util '_INSTANCE';
 
 use vars qw{$VERSION};
 BEGIN {
@@ -59,8 +59,8 @@ Returns the content of the script as a string, or C<undef> on error.
 
 sub process {
 	my $self   = shift;
-	my $Inline = isa(ref $_[0], 'Test::Inline')         ? shift : return undef;
-	my $Script = isa(ref $_[0], 'Test::Inline::Script') ? shift : return undef;
+	my $Inline = _INSTANCE(shift, 'Test::Inline')         or return undef;
+	my $Script = _INSTANCE(shift, 'Test::Inline::Script') or return undef;
 
 	# If used directly, create a valid script file that just dies
 	my $class   = $Script->class;

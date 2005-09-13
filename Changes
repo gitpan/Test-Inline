@@ -1,5 +1,14 @@
 Revision history for Perl extension Test::Inline
 
+2.101    Tue Sep 13 2005
+	- Rebuilding to synchronize with new Module::Install and
+	  ExtUtils::AutoInstall
+	- Tweaks the per-section test code to make more applicable value
+	  appear in the failure summary.
+	- Removed all remaining use of UNIVERSAL::isa, switching to a
+	  more accurate Params::Util approach. Should allow for improved
+	  extensibility.
+
 2.100    Thu Jul 14 2005
 	- Worked as good as I hoped, moving to production release
 	- Bundling a couple of build-time-only deps

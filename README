@@ -6,7 +6,7 @@ DESCRIPTION
 
     This is a nice supplement to the traditional .t files.
 
-    It's like XUnit, Perl-style.
+    It's like XUnit, only better and Perl-style.
 
   How does it work?
     "Test::Inline" lets you write small fragments of general or
@@ -20,7 +20,7 @@ DESCRIPTION
       ok( -f /proc/cpuinfo, 'Host has a standard /proc/cpuinfo file' );
   
       =end testing
-
+  
       # Completely test a single method
   
       =begin testing label
@@ -242,6 +242,12 @@ METHODS
     them to the "output" directory.
 
     Returns the number of test files generated. Returns "undef" on error.
+
+BUGS
+    The "Extended =begin" syntax used for non-trivial sections is not really
+    considered part of the spec yet. While simple '=begin testing' sections
+    are find and will pass POD testing, extended begin sections may cause
+    POD errors.
 
 TO DO
     - Add support for "example" sections

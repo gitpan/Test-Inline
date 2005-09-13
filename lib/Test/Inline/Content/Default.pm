@@ -16,18 +16,18 @@ This module contains no user servicable parts.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use base 'Test::Inline::Content';
+use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 sub process {
 	my $self   = shift;
-	my $Inline = isa(ref $_[0], 'Test::Inline')         ? shift : return undef;
-	my $Script = isa(ref $_[0], 'Test::Inline::Script') ? shift : return undef;
+	my $Inline = _INSTANCE(shift, 'Test::Inline')         or return undef;
+	my $Script = _INSTANCE(shift, 'Test::Inline::Script') or return undef;
 
 	# Get the merged content
 	my $content = $Script->merged_content;

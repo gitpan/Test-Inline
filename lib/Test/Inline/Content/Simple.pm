@@ -44,13 +44,13 @@ The C<tests> tag will be replaced by the actual testing code.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use base 'Test::Inline::Content';
-use File::Slurp ();
+use File::Slurp  ();
+use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 }
 
 
@@ -80,8 +80,8 @@ sub new {
 
 	# Load, check and add the file
 	my $template = File::Slurp::read_file( $file ) or return undef;
-	$template =~ /\[%\s+tests\s+\%\]/           or return undef;
-	$template =~ /\[\%\s+plan\s+\%\]/            or return undef;
+	$template =~ /\[%\s+tests\s+\%\]/              or return undef;
+	$template =~ /\[\%\s+plan\s+\%\]/              or return undef;
 	$self->{template} = $template;
 
 	$self;
@@ -114,8 +114,8 @@ The C<process> method is unchanged from C<Test::Inline::Content>.
 
 sub process {
 	my $self   = shift;
-	my $Inline = isa(ref $_[0], 'Test::Inline')         ? shift : return undef;
-	my $Script = isa(ref $_[0], 'Test::Inline::Script') ? shift : return undef;
+	my $Inline = _INSTANCE(shift, 'Test::Inline')         or return undef;
+	my $Script = _INSTANCE(shift, 'Test::Inline::Script') or return undef;
 
 	# Get the merged content
 	my $content = $Script->merged_content;

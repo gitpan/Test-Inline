@@ -96,13 +96,13 @@ order of appearance.
 =cut
 
 use strict;
-use UNIVERSAL 'isa';
 use base 'Algorithm::Dependency::Item';
-use List::Util ();
+use List::Util   ();
+use Params::Util qw{_ARRAY};
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.101';
 	$errstr  = '';
 }
 
@@ -357,7 +357,7 @@ and set it in the Sections.
 sub parse {
 	$errstr      = '';
 	my $class    = shift;
-	my $elements = ref $_[0] eq 'ARRAY' ? shift : return undef;
+	my $elements = _ARRAY(shift) or return undef;
 	my @Sections = ();
 
 	# Iterate over the elements and maintain package contexts
