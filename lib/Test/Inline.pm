@@ -131,7 +131,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.101';
+	$VERSION = '2.102';
 }
 
 
@@ -765,7 +765,7 @@ For other issues, contact the maintainer.
 
 =head1 AUTHOR
 
-Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
 
 =head1 ACKNOWLEDGEMENTS
 

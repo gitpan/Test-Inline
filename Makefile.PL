@@ -21,6 +21,12 @@ requires       ( 'Class::Autouse'        => '1.15'    );
 requires       ( 'Algorithm::Dependency' => '1.02'    );
 requires       ( 'File::Flat'            => '0.95'    );
 
+# Because some programs incorrectly do things like...
+#   if ( installed('Test::Inline') ) { system('pod2test') }
+# ... we need to make sure it is installed.
+# This is a temporary arrangement to end in 2008.
+requires       ( 'Pod::Tests'            => '0.18'    );
+
 # Testing modules (bundled where appropriate)
 build_requires ( 'Test::More'            => '0.47'    );
 build_requires ( 'Test::ClassAPI'        => '1.02'    );

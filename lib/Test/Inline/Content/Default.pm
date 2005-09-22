@@ -21,7 +21,7 @@ use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.101';
+	$VERSION = '2.102';
 }
 
 sub process {
@@ -70,7 +70,7 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
