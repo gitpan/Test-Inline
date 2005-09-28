@@ -21,7 +21,6 @@ lib/Test/Inline/Content/Legacy.pm
 lib/Test/Inline/Content/Simple.pm
 lib/Test/Inline/Extract.pm
 lib/Test/Inline/IO/File.pm
-lib/Test/Inline/IO/File/VCS.pm
 lib/Test/Inline/Script.pm
 lib/Test/Inline/Section.pm
 lib/Test/Inline/Util.pm

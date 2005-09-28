@@ -37,7 +37,7 @@ use Class::Autouse 'File::Flat',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.102';
+	$VERSION = '2.103';
 }
 
 

@@ -66,14 +66,12 @@ is_deeply( $File->find( 'Test/Inline' ), [
 	catfile( 'Test', 'Inline', 'Content', 'Simple.pm'  ),
 	catfile( 'Test', 'Inline', 'Extract.pm'            ),
 	catfile( 'Test', 'Inline', 'IO', 'File.pm'         ),
-	catfile( 'Test', 'Inline', 'IO', 'File', 'VCS.pm'  ),
 	catfile( 'Test', 'Inline', 'Script.pm'             ),
 	catfile( 'Test', 'Inline', 'Section.pm'            ),
 	catfile( 'Test', 'Inline', 'Util.pm'               ),
 	], '->find with path returns everything below it' );
 is_deeply( $File->find( 'Test/Inline/IO' ), [
 	catfile( 'Test', 'Inline', 'IO', 'File.pm'    ),
-	catfile( 'Test', 'Inline', 'IO', 'File', 'VCS.pm' ),
 	], '->find with path returns everything below it' );
 is( $File->find( 'Test/Inline3' ), undef, '->find with a dir returns undef' );
 

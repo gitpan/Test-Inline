@@ -112,14 +112,17 @@ will be run after the numbered tests.
 =cut
 
 use strict;
-use File::Spec            ();
-use IO::Handle            ();
-use Params::Util          qw{_CLASS _INSTANCE _SCALAR _CODE};
-use Algorithm::Dependency ();
-use Test::Inline::Util    ();
-use Test::Inline::Section ();
-use Test::Inline::Script  ();
-use Test::Inline::Content ();
+use File::Spec                     ();
+use IO::Handle                     ();
+use Params::Util                   '_CLASS',
+                                   '_INSTANCE',
+                                   '_SCALAR',
+                                   '_CODE';
+use Algorithm::Dependency          ();
+use Test::Inline::Util             ();
+use Test::Inline::Section          ();
+use Test::Inline::Script           ();
+use Test::Inline::Content          ();
 use Test::Inline::Content::Legacy  ();
 use Test::Inline::Content::Default ();
 use Test::Inline::Content::Simple  ();
@@ -131,7 +134,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.102';
+	$VERSION = '2.103';
 }
 
 

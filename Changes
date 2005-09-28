@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Inline
 
+2.103    Wed Sep 28 2005
+	- Removed Test::Inline::IO::File::VCS. It is incompleted, and never
+	  should have been distributed in the dist.
+
 2.102    Thu Sep 22 2005
 	- To handle people with problems installing RT and a few other
 	  programs, add a dependency on Pod::Tests
