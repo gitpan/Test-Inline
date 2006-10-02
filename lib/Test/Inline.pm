@@ -4,11 +4,11 @@ package Test::Inline;
 
 =head1 NAME
 
-Test::Inline - Inlining your tests next to the code being tested
+Test::Inline - Lets you put tests in your modules, next to tested code
 
 =head1 DESCRIPTION
 
-Embedding tests allows tests to be placed near the code it's testing.
+Embedding tests allows tests to be placed near the code being tested.
 
 This is a nice supplement to the traditional .t files.
 
@@ -17,19 +17,18 @@ It's like XUnit, only better and Perl-style.
 =head2 How does it work?
 
 C<Test::Inline> lets you write small fragments of general or
-method-specific testing code, and insert it anywhere you want in your
+function-specific testing code, and insert it anywhere you want in your
 modules, inside a specific tagged L<POD|perlpod> segment, like the
 following.
 
-  # A fragment of general test code
-  
   =begin testing
   
+  # This code assumes we have a cpuinfo file
   ok( -f /proc/cpuinfo, 'Host has a standard /proc/cpuinfo file' );
   
   =end testing
   
-  # Completely test a single method
+  
   
   =begin testing label
   
@@ -40,7 +39,7 @@ following.
   =end testing
 
 You can add as many, or as few, of these chunks of tests as you wish.
-The key condition when writing them is that they should be conceptually
+The key condition when writing them is that they should be logically
 independant of each other. Each chunk of testing code should not die
 or crash if it is run before or after another chunk.
 
@@ -58,7 +57,15 @@ In any large groups of modules, you can add testing code here, there and
 everywhere, anywhere you want. The next time the test compiler is run, a
 new test script will just appear.
 
-It's also extremely for systematically testing self-contained code.
+This also makes it great for testing assumptions you normally wouldn't
+bother to write run-time code to test. It ensures that your assumptions
+about the way Perl does some operation, or about the state of the host,
+are confirmed at install-time.
+
+If your assumption is ever wrong, it gets picked up at install-time and
+based on the test failures, you can correct your assumption.
+
+It's also extremely useful for systematically testing self-contained code.
 
 That is, any code which can be independantly tested without the need for
 external systems such as databases, and that has no side-effects on external
@@ -68,9 +75,18 @@ All of this code, written by multiple people, can then have one single set
 of test files generated. You can check all the bits and pieces of a large
 API, or anything you like, in fine detail.
 
+Test::Inline also introduces the concept of unit-tested documentation.
+
+Not only can your code be tested, but if you have a FAQ or some other
+pure documentation module, you can validate that the documentation is
+correct for the version of the module installed.
+
+If the module ever changes to break the documentation, you can catch it
+and correct the documentation.
+
 =head2 What is Test::Inline bad for?
 
-C<Test::Inline> is not a complete testing solution, and there are several
+C<Test::Inline> is B<not> a complete testing solution, and there are several
 types of testing you probably DON'T want to use it for.
 
 =over
@@ -91,14 +107,15 @@ Tests with side-effects such as those that might change a testing database
 
 =head2 Getting Started
 
-Because Test::Inline creates test scripts that _don't_ start with a
-numeric order, is to create your normal tests using file names
-in the CPAN style of C<01_compile.t>, C<02_main.t>, C<03_foobar.t>.
+Because Test::Inline creates test scripts with file names that B<don't>
+start with a number (for ordering purposes), the first step is to create
+your normal test scripts using file names in the CPAN style of
+F<01_compile.t>, F<02_main.t>, F<03_foobar.t>, and so on.
 
 You can then add your testing fragments wherever you like throughout
-your code, and then use the C<inline2test> script to generate the test
-scripts for the inline tests. By default the test will be named after
-the packages that the test fragments are in.
+your code, and use the F<inline2test> script to generate the test scripts
+for the inline tests. By default the test scripts will be named after
+the packages/classes that the test fragments are found in.
 
 Tests for Class::Name will end up in the file C<class_name.t>.
 
@@ -111,6 +128,7 @@ will be run after the numbered tests.
 
 =cut
 
+use 5.005;
 use strict;
 use File::Spec                     ();
 use IO::Handle                     ();
@@ -134,7 +152,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.103';
+	$VERSION = '2.105';
 }
 
 
@@ -192,8 +210,8 @@ to the C<OutputHandler>.
 B<output> - The C<output> option provides the location of the directory
 where the tests will be written to. It should both already exist, and be
 writable. If using a custom C<OutputHandler>, the value of C<output> should
-refer to the location B<within the OutputHandler> the files will be written
-to.
+refer to the location B<within the OutputHandler> that the files will be
+written to.
 
 B<InputHandler> - The C<InputHandler> option, if provided, supplies an
 alternative C<FileHandler> from which source modules are retrieved.
@@ -745,9 +763,11 @@ sub _error {
 
 =head1 BUGS
 
-The "Extended =begin" syntax used for non-trivial sections is not really
-considered part of the spec yet. While simple '=begin testing' sections are
-find and will pass POD testing, extended begin sections may cause POD errors.
+The "Extended =begin" syntax used for non-trivial sections is not formalised
+as part of the POD spec yet, although it is on the track to being included.
+
+While simple '=begin testing' sections are fine and will pass POD testing,
+extended begin sections may cause POD errors.
 
 =head1 TO DO
 
@@ -768,7 +788,7 @@ For other issues, contact the maintainer.
 
 =head1 AUTHOR
 
-Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
+Adam Kennedy E<lt>cpan@ali.asE<gt>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -777,7 +797,7 @@ the open sourcing and release of this distribution.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 - 2005 Phase N Austalia. All rights reserved.
+Copyright (c) 2004 - 2006 Phase N Austalia. All rights reserved.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

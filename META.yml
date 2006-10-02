@@ -1,27 +1,27 @@
-name: Test-Inline
-version: 2.103
-abstract: Inlining your tests next to the code being tested
-author: Adam Kennedy <adam@ali.as>
-license: unknown
-distribution_type: module
-build_requires:
-  Test::More: 0.47
+abstract: Lets you put tests in your modules, next to tested code
+author: Adam Kennedy <cpan@ali.as>
+build_requires: 
   Test::ClassAPI: 1.02
-requires:
-  perl: 5.005
-  File::Spec: 0.80
-  List::Util: 1.11
-  Getopt::Long: 2.34
-  File::Slurp: 9999.04
-  File::Find::Rule: 0.26
-  Config::Tiny: 2.00
-  Params::Util: 0.05
-  Class::Autouse: 1.15
-  Algorithm::Dependency: 1.02
-  File::Flat: 0.95
-  Pod::Tests: 0.18
-no_index:
-  directory:
-    - t.data
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Test-Inline
+no_index: 
+  directory: 
     - inc
-generated_by: Module::Install version 0.37
+    - t
+requires: 
+  Algorithm::Dependency: 1.02
+  Class::Autouse: 1.15
+  Config::Tiny: 2.00
+  File::Find::Rule: 0.26
+  File::Flat: 0.95
+  File::Slurp: 9999.04
+  File::Spec: 0.80
+  Getopt::Long: 2.34
+  List::Util: 1.11
+  Params::Util: 0.05
+  Pod::Tests: 0.18
+  perl: 5.005
+version: 2.105

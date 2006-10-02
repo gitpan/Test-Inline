@@ -28,7 +28,6 @@ and write them to an output path.
 =cut
 
 use strict;
-use warnings;
 use File::Spec::Functions ':ALL';
 use Getopt::Long;
 use Config::Tiny;
@@ -38,7 +37,7 @@ use Test::Inline::IO::File ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.100';
+	$VERSION = '2.105';
 }
 
 # Predeclare things

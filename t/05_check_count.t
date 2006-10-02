@@ -4,14 +4,18 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	unless ( $ENV{HARNESS_ACTIVE} ) {
 		require FindBin;
-		chdir ($FindBin::Bin = $FindBin::Bin); # Avoid a warning
-		lib->import( catdir( updir(), updir(), 'modules') );
+		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
+		chdir catdir( $FindBin::Bin, updir() );
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -19,7 +23,7 @@ use Test::More tests => 36;
 use Test::Inline ();
 
 # Prepare
-my $example  = File::Spec->catfile( 't.data', 'example' );
+my $example  = File::Spec->catfile( 't', 'data', 'example' );
 my $testfile = 'foo_bar.t';
 
 sub is_string {
@@ -124,7 +128,7 @@ END_TEST
 
 
 
-$example  = File::Spec->catfile( 't.data', 'check_count' );
+$example  = File::Spec->catfile( 't', 'data', 'check_count' );
 
 
 

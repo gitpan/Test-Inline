@@ -4,14 +4,18 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	unless ( $ENV{HARNESS_ACTIVE} ) {
 		require FindBin;
-		chdir ($FindBin::Bin = $FindBin::Bin); # Avoid a warning
-		lib->import( catdir( updir(), updir(), 'modules') );
+		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
+		chdir catdir( $FindBin::Bin, updir() );
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -31,7 +35,7 @@ isa_ok( $Content, 'Test::Inline::Content' );
 # We'll need an Inline object
 my $Inline = Test::Inline->new;
 isa_ok( $Inline, 'Test::Inline' );
-my $example = catfile( 't.data', 'example' );
+my $example = catfile( 't', 'data', 'example' );
 ok( $Inline->add( $example ), 'Adding example file' );
 
 # Check the ::Script object created by the addition
@@ -91,7 +95,7 @@ ok( (defined $rv and ! ref $rv and length $rv), '->process(good) returns a strin
 #####################################################################
 # Test::Inline::Content::Simple Tests
 
-my $file   = catfile( 't.data', '12_content_handler', 'test.tpl' );
+my $file   = catfile( 't', 'data', '12_content_handler', 'test.tpl' );
 ok( -f $file, 'Test file exists' );
 my $Simple = Test::Inline::Content::Simple->new( $file );
 isa_ok( $Simple, 'Test::Inline::Content::Simple' );
