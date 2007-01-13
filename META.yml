@@ -1,6 +1,7 @@
 abstract: Lets you put tests in your modules, next to tested code
 author: Adam Kennedy <cpan@ali.as>
 build_requires: 
+  File::Remove: 0
   Test::ClassAPI: 1.02
   Test::More: 0.42
 distribution_type: module
@@ -16,7 +17,7 @@ requires:
   Class::Autouse: 1.15
   Config::Tiny: 2.00
   File::Find::Rule: 0.26
-  File::Flat: 0.95
+  File::Flat: 1.00
   File::Slurp: 9999.04
   File::Spec: 0.80
   Getopt::Long: 2.34
@@ -24,4 +25,4 @@ requires:
   Params::Util: 0.05
   Pod::Tests: 0.18
   perl: 5.005
-version: 2.105
+version: 2.200

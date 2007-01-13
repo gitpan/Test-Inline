@@ -152,7 +152,7 @@ use base 'Algorithm::Dependency::Source';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.105';
+	$VERSION = '2.200';
 }
 
 
@@ -163,8 +163,6 @@ BEGIN {
 # Constructor and Accessors
 
 =pod
-
-=head1 METHODS
 
 =head2 new
 

@@ -104,7 +104,6 @@ DESCRIPTION
     will be run after the numbered tests.
 
 METHODS
-METHODS
   new
       my $Tests = Test::Inline->new(
               verbose  => 1,
