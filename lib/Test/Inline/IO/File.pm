@@ -4,41 +4,48 @@ package Test::Inline::IO::File;
 
 =head1 NAME
 
-Test::Inline::IO::File - Local Filesystem IO Handler
+Test::Inline::IO::File - Test::Inline Local Filesystem IO Handler
 
 =head1 DESCRIPTION
 
-L<Test::Inline> 2.00 was conceived in an enterprise setting, and retains
-the flexibilty, power, and bulk that this created.
+B<Test::Inline::IO::File> is the default IO handler for L<Test::Inline>.
 
-The intent with the C<FileHandler> system is to allow L<Test::Inline> to
-be able to pull source data from anywhere, and write the resulting test
-scripts to anywhere.
+L<Test::Inline> 2.0 was conceived in an enterprise setting, and retains
+the flexibilty, power, and bulk that this created, although for most
+users the power and complexity that is available is largely hidden away
+under multiple layers of sensible defaults.
 
-Until a more powerful pure-OO file-system module comes along in the form
-of the L<FSI> project, this serves as a minimalist implementation of the
-functionality that L<Test::Inline> needs in order to work.
+The intent with the C<InputHandler> and C<OutputHandle> parameters is to
+allow L<Test::Inline> to be able to pull source data from anywhere, and
+write the resulting test scripts to anywhere.
 
-An alternative C<FileHandler> class need not subclass this one, merely
-implement the same interface, taking whatever alternative arguments to
-the C<new> constructor that it wishes.
+Until a more powerful pure-OO file-system API comes along, this module
+serves as a minimalist implementation of the subset of functionality
+that L<Test::Inline> needs in order to work.
 
-All methods in this class take unix-style paths, translating to the
-underlying filesystem if required.
+An alternative IO Handler class need not subclass this one (although it
+is recommended), merely implement the same interface, taking whatever
+alternative arguments to the C<new> constructor that it wishes.
+
+All methods in this class are provided with unix-style paths, and should do
+the translating to the underlying filesystem themselves if required.
 
 =head1 METHODS
 
 =cut
 
 use strict;
-use File::Spec ();
+use File::Spec  ();
+use File::chmod ();
 use Class::Autouse 'File::Flat',
                    'File::Find::Rule';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '2.201';
+	$VERSION = '2.202';
 }
+
+use constant FS_WIN => !! $^O eq 'MSWin32';
 
 
 
@@ -49,7 +56,16 @@ BEGIN {
 
 =pod
 
-=head2 new $path
+=head2 new
+
+  # Simplified usage
+  $io_handler = Test::Inline::IO::File->new( $path );
+  
+  # Full key/value usage
+  $io_handler = Test::Inline::IO::File->new(
+          path     => $path,
+          readonly => 1,
+  );
 
 The C<new> constructor takes a root path on the local filesystem
 and returns a new C<Test::Inline::IO::File> object to that
@@ -58,9 +74,28 @@ location.
 =cut
 
 sub new {
-	my $class = shift;
-	my $path  = defined $_[0] ? shift : File::Spec->curdir;
-	bless { path => $path }, $class;
+	my $class  = shift;
+	my @params = @_;
+	if ( @params < 2 ) {
+		my $path  = defined $_[0] ? shift : File::Spec->curdir;
+		@params = ( path => $path );
+	}
+
+	# Create the object
+	my $self = bless { @params }, $class;
+
+	# Apply defaults
+	$self->{readonly} = !! $self->{readonly};
+
+	return $self;
+}
+
+sub path {
+	$_[0]->{path};
+}
+
+sub readonly {
+	$_[0]->{readonly};
 }
 
 # Resolve the full path for any file
@@ -144,7 +179,16 @@ it and it's path if needed.
 sub write {
 	my $self = shift;
 	my $file = $self->_path(shift) or return undef;
-	File::Flat->write( $file, @_ );
+	my $rv   = File::Flat->write( $file, @_ );
+	if ( $rv and $self->readonly ) {
+		if ( FS_WIN ) {
+			# Enable Win32 filesystem readonly flag
+			### TO BE COMPLETED
+		} else {
+			File::chmod::symchmod('a-w', $file);
+		}
+	}
+	return $rv;
 }
 
 =pod
@@ -208,11 +252,11 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 - 2005 Phase N Austalia. All rights reserved.
+Copyright 2004 - 2007 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

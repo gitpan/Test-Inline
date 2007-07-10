@@ -102,7 +102,7 @@ use Params::Util qw{_ARRAY};
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '2.201';
+	$VERSION = '2.202';
 	$errstr  = '';
 }
 
@@ -181,9 +181,11 @@ sub new {
 	# Remove the =begin
 	shift @parts;
 
-	# If the line ends with a number then this is the number of tests
-	if ( defined $parts[-1] and $parts[-1] =~ /^(0|[1-9]\d*)$/ ) {
-		$self->{tests} = pop @parts;
+	# If the line contains a number then this is part of the tests
+	foreach my $i ( 0 .. $#parts ) {
+		next unless $parts[$i] =~ /^(0|[1-9]\d*)$/;
+		$self->{tests} = splice @parts, $i, 1;
+		last;
 	}
 
 	# Handle setup sections via =begin test setup or =begin testing SETUP
@@ -549,11 +551,11 @@ See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
 =head1 AUTHOR
 
-Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 - 2005 Phase N Austalia. All rights reserved.
+Copyright 2004 - 2007 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
