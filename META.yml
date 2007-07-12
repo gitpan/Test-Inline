@@ -30,4 +30,4 @@ requires:
   Params::Util: 0.05
   Pod::Tests: 0.18
   perl: 5.005
-version: 2.203
+version: 2.204
