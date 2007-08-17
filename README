@@ -1,12 +1,11 @@
 NAME
-    Test::Inline - Lets you put tests in your modules, next to tested code
+    Test::Inline - Embed your tests in your code, next to what is being
+    tested
 
 DESCRIPTION
     Embedding tests allows tests to be placed near the code being tested.
 
     This is a nice supplement to the traditional .t files.
-
-    It's like XUnit, only better and Perl-style.
 
   How does it work?
     "Test::Inline" lets you write small fragments of general or
@@ -109,7 +108,7 @@ METHODS
               verbose  => 1,
               readonly => 1,
               output   => 'auto',
-              manifest => 'auto.manifest',
+              manifest => 'auto/manifest',
               );
 
     The "new" constructor creates a new test generation framework. Once the

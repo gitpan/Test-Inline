@@ -1,5 +1,5 @@
 --- 
-abstract: Lets you put tests in your modules, next to tested code
+abstract: Embed your tests in your code, next to what is being tested
 author: Adam Kennedy <adamk@cpan.org>
 build_requires: 
   Test::ClassAPI: 1.02
@@ -31,4 +31,4 @@ requires:
   Params::Util: 0.21
   Pod::Tests: 0.18
   perl: 5.005
-version: 2.206
+version: 2.207
