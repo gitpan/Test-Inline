@@ -13,19 +13,21 @@ DESCRIPTION
     modules, inside a specific tagged POD segment, like the following.
 
       =begin testing
-  
-      # This code assumes we have a cpuinfo file
+      
+  # This code assumes we have a cpuinfo file
       ok( -f /proc/cpuinfo, 'Host has a standard /proc/cpuinfo file' );
+      
+  =end testing
+      
   
-      =end testing
   
-      =begin testing label
-  
-      # Test generation of the <label> HTML tag
+  =begin testing label
+      
+  # Test generation of the <label> HTML tag
       is( My::HTML->label('foo'),        '<label>foo</label>',           '->label(simple) works' );
       is( My::HTML->label('bar', 'foo'), '<label for="bar">foo</label>', '->label(for) works'    );
-  
-      =end testing
+      
+  =end testing
 
     You can add as many, or as few, of these chunks of tests as you wish.
     The key condition when writing them is that they should be logically
@@ -298,7 +300,7 @@ ACKNOWLEDGEMENTS
     sourcing and release of this distribution.
 
 COPYRIGHT
-    Copyright 2004 - 2007 Adam Kennedy.
+    Copyright 2004 - 2009 Adam Kennedy.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
