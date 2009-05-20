@@ -19,8 +19,6 @@ DESCRIPTION
       
   =end testing
       
-  
-  
   =begin testing label
       
   # Test generation of the <label> HTML tag
@@ -107,11 +105,11 @@ DESCRIPTION
 METHODS
   new
       my $Tests = Test::Inline->new(
-              verbose  => 1,
-              readonly => 1,
-              output   => 'auto',
-              manifest => 'auto/manifest',
-              );
+          verbose  => 1,
+          readonly => 1,
+          output   => 'auto',
+          manifest => 'auto/manifest',
+      );
 
     The "new" constructor creates a new test generation framework. Once the
     constructor has been used to create the generator, the "add_class"
@@ -172,6 +170,10 @@ METHODS
     Returns a new "Test::Inline" object on success.
 
     Returns "undef" if there is a problem with one of the options.
+
+  exception
+    The "exception" method returns a flag which indicates whether error will
+    be returned via exceptions.
 
   InputHandler
     The "InputHandler" method returns the file handler object that will be

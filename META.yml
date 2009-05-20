@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.84'
+generated_by: 'Module::Install version 0.89'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,6 @@ no_index:
     - t
 requires:
   Algorithm::Dependency: 1.02
-  Class::Autouse: 1.15
   Config::Tiny: 2.00
   File::Find::Rule: 0.26
   File::Flat: 1.00
@@ -40,4 +39,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Test-Inline
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/Test-Inline
-version: 2.209
+version: 2.210
