@@ -37,9 +37,6 @@ t/10_legacy_extract.t
 t/11_legacy_script.t
 t/12_content_handler.t
 t/13_api.t
-t/97_meta.t
-t/98_pod.t
-t/99_pmv.t
 t/data/06_multifile/All.pm
 t/data/06_multifile/lib/Test/One.pm
 t/data/06_multifile/lib/Test/Three.pm
@@ -51,3 +48,6 @@ t/data/12_content_handler/test.tpl
 t/data/bad_dependency
 t/data/check_count
 t/data/example
+xt/meta.t
+xt/pmv.t
+xt/pod.t
