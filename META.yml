@@ -3,14 +3,15 @@ abstract: 'Embed your tests in your code, next to what is being tested'
 author:
   - 'Adam Kennedy <adamk@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
   Test::ClassAPI: 1.02
   Test::More: 0.42
   Test::Script: 1.02
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
-generated_by: 'Module::Install version 1.00'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,4 +41,4 @@ resources:
   ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Test-Inline
   license: http://dev.perl.org/licenses/
   repository: http://svn.ali.as/cpan/trunk/Test-Inline
-version: 2.212
+version: 2.213
